@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetSafe — Letramento Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --terra:#D4603A;--terra-light:#E87B50;--teal:#7BBFB5;--teal-dark:#5AA099;
+  --gold:#E8B84B;--cream:#F5F0E8;--paper:#EDE8DC;--dark:#1A1612;--mid:#3D3530;
+  --soft:#8C8078;--green:#6BAF7A;--blue:#5B9BD5;--red:#D45050;--purple:#9B7FD4;
+  --bg:var(--cream);--surface:#FFFFFF;--text:var(--dark);--subtext:var(--soft);
+  --border:rgba(0,0,0,0.08);--shadow:0 4px 24px rgba(0,0,0,0.08);
+  --radius:20px;--radius-sm:12px;
+}
+[data-theme="dark"]{--bg:#0F0D0B;--surface:#1E1A16;--text:#F5F0E8;--subtext:#8C8078;--border:rgba(255,255,255,0.08);--shadow:0 4px 24px rgba(0,0,0,0.4);--paper:#1A1612;--cream:#0F0D0B;}
+[data-theme="pastel"]{--terra:#E8967A;--teal:#9DD6CE;--gold:#F0CB6E;--bg:#FDF8F5;--surface:#FFFFFF;--text:#3D3530;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:16px;scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes blob{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}50%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%}}
+@keyframes shimmer{0%{left:-100%}100%{left:200%}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px var(--terra)}50%{box-shadow:0 0 24px var(--terra)}}
+
+/* WELCOME */
+#screen-welcome{background:var(--cream);align-items:center;justify-content:center;position:relative;overflow:hidden;padding:2rem;}
+.blob1,.blob2,.blob3{position:absolute;border-radius:60% 40% 30% 70%/60% 30% 70% 40%;animation:blob 8s ease-in-out infinite;z-index:0;}
+.blob1{width:320px;height:320px;background:linear-gradient(135deg,var(--terra),var(--gold));top:-80px;right:-60px;opacity:.7;}
+.blob2{width:240px;height:240px;background:linear-gradient(135deg,var(--teal),#A8D8D2);bottom:-60px;left:-40px;opacity:.6;animation-delay:-3s;}
+.blob3{width:180px;height:180px;background:linear-gradient(135deg,var(--gold),var(--terra-light));top:40%;left:10%;opacity:.3;animation-delay:-5s;}
+.sparkle{position:absolute;font-size:1.5rem;animation:float 3s ease-in-out infinite;}
+.s1{top:15%;left:15%}.s2{top:20%;right:20%;animation-delay:.5s}.s3{bottom:25%;right:10%;animation-delay:1s}.s4{bottom:30%;left:20%;animation-delay:1.5s}
+.welcome-content{position:relative;z-index:2;text-align:center;max-width:360px;width:100%;}
+.logo-badge{display:inline-flex;align-items:center;gap:8px;background:var(--dark);color:var(--cream);padding:6px 16px;border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.5rem;animation:pop .6s ease;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--terra);display:inline-block;}
+.welcome-title{font-family:'Fraunces',serif;font-size:clamp(3rem,12vw,5rem);font-weight:900;line-height:.9;margin-bottom:.5rem;}
+.welcome-title .outline{-webkit-text-stroke:2px var(--dark);color:transparent;display:block;}
+.welcome-title .fill{color:var(--dark);display:block;}
+.welcome-title .script{font-family:'Caveat',cursive;font-style:italic;color:var(--terra);display:block;font-size:.6em;}
+.welcome-sub{font-size:1rem;color:var(--subtext);margin:1rem 0 2rem;line-height:1.5;}
+.btn-primary{background:var(--dark);color:var(--cream);border:none;padding:16px 40px;border-radius:999px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:4px 4px 0 var(--terra);position:relative;overflow:hidden;}
+.btn-primary:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--terra);}
+.btn-primary:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--terra);}
+.btn-primary::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:shimmer 2.5s infinite;}
+.btn-full{width:100%;}
+.btn-secondary{background:var(--surface);color:var(--text);border:2px solid var(--border);padding:14px 28px;border-radius:999px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{border-color:var(--terra);color:var(--terra);}
+
+/* ONBOARD */
+#screen-onboard{background:var(--bg);padding:2rem 1.5rem;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.ob-blob{position:absolute;border-radius:50%;z-index:0;animation:blob 10s ease-in-out infinite;}
+.ob-b1{width:300px;height:300px;background:linear-gradient(135deg,var(--teal),#A8D8D2);top:-100px;right:-80px;opacity:.4;}
+.ob-b2{width:200px;height:200px;background:linear-gradient(135deg,var(--gold),var(--terra));bottom:-180px;left:-90px;opacity:.3;animation-delay:-4s;}
+.onboard-wrap{position:relative;z-index:2;width:100%;max-width:400px;}
+.ob-step{display:none;}
+.ob-step.active{display:block;animation:slideIn .3s ease;}
+.ob-step-num{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--subtext);margin-bottom:.5rem;}
+.ob-title{font-family:'Fraunces',serif;font-weight:900;font-size:2rem;line-height:1.1;margin-bottom:.5rem;}
+.ob-sub{color:var(--subtext);font-size:.9rem;margin-bottom:1.5rem;line-height:1.5;}
+.ob-progress{display:flex;gap:6px;margin-bottom:2rem;}
+.ob-dot{height:4px;flex:1;border-radius:999px;background:var(--border);transition:background .3s;}
+.ob-dot.done{background:var(--terra);}
+.age-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.age-card{border:2px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);}
+.age-card:hover{border-color:var(--terra);transform:translateY(-2px);}
+.age-card.selected{border-color:var(--terra);background:rgba(212,96,58,.08);}
+.age-card .age-emoji{font-size:2rem;display:block;margin-bottom:6px;}
+.age-card .age-range{font-weight:700;font-size:.9rem;display:block;}
+.age-card .age-label{font-size:.75rem;color:var(--subtext);}
+.ob-input{width:100%;border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;background:var(--surface);color:var(--text);margin-bottom:12px;transition:border-color .2s;outline:none;}
+.ob-input:focus{border-color:var(--terra);}
+.avatar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
+.avatar-item{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;border:3px solid transparent;transition:all .2s;background:var(--paper);}
+.avatar-item:hover{transform:scale(1.1);}
+.avatar-item.selected{border-color:var(--terra);box-shadow:0 0 0 4px rgba(212,96,58,.2);}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem;}
+.theme-card{border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);}
+.theme-card:hover{transform:translateY(-2px);}
+.theme-card.selected{border-color:var(--terra);}
+.theme-swatch{width:32px;height:32px;border-radius:50%;margin:0 auto 8px;}
+.theme-label{font-size:.75rem;font-weight:600;}
+.pref-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:.85rem;font-weight:500;}
+.toggle{width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s;background:var(--border);flex-shrink:0;}
+.toggle.on{background:var(--terra);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;transition:transform .2s;}
+.toggle.on::after{transform:translateX(20px);}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px;position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);}
+.topbar-logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.3rem;}
+.topbar-logo span{color:var(--terra);}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.avatar-mini{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--terra),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;border:2px solid var(--border);}
+.xp-badge{display:flex;align-items:center;gap:4px;background:var(--surface);border:1.5px solid var(--border);border-radius:999px;padding:4px 10px;font-size:.75rem;font-weight:700;}
+.xpbar-wrap{padding:8px 20px 0;}
+.xpbar-label{display:flex;justify-content:space-between;font-size:.7rem;color:var(--subtext);margin-bottom:4px;}
+.xpbar-track{height:6px;border-radius:999px;background:var(--border);overflow:hidden;}
+.xpbar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--terra),var(--gold));transition:width .8s cubic-bezier(.34,1.56,.64,1);position:relative;}
+.xpbar-fill::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
+
+/* APP */
+#screen-app{background:var(--bg);}
+.app-wrap{max-width:420px;margin:0 auto;padding-bottom:108px;}
+.hero{padding:20px 20px 0;}
+.hero-greeting{font-size:.85rem;color:var(--subtext);margin-bottom:2px;}
+.hero-name{font-family:'Fraunces',serif;font-weight:900;font-size:1.8rem;line-height:1.1;}
+.hero-name em{color:var(--terra);font-style:italic;}
+.hero-card{margin-top:16px;border-radius:var(--radius);background:linear-gradient(135deg,var(--dark),var(--mid));color:var(--cream);padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;}
+.hero-card:hover{transform:translateY(-2px);}
+.hero-card-blob{position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--terra),var(--gold));opacity:.3;}
+.hero-tag{display:inline-block;background:rgba(255,255,255,.15);border-radius:999px;padding:3px 10px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+.hero-card h3{font-family:'Fraunces',serif;font-weight:900;font-size:1.3rem;margin-bottom:4px;}
+.hero-card p{font-size:.82rem;opacity:.8;line-height:1.5;}
+.hero-card-cta{display:inline-flex;align-items:center;gap:6px;background:var(--terra);color:white;border-radius:999px;padding:8px 16px;font-size:.8rem;font-weight:700;margin-top:14px;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 10px;}
+.sec-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.2rem;}
+.sec-link{font-size:.78rem;color:var(--terra);font-weight:600;cursor:pointer;}
+.modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px;}
+.mod-card{border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1.5px solid var(--border);background:var(--surface);min-height:148px;display:flex;flex-direction:column;justify-content:space-between;}
+.mod-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.mod-icon{font-size:2.15rem;margin-bottom:8px;display:block;}
+.mod-title{font-weight:700;font-size:.92rem;line-height:1.35;}
+.mod-sub{font-size:.78rem;color:var(--subtext);margin-top:4px;line-height:1.35;}
+.mod-progress{height:3px;border-radius:999px;background:var(--border);margin-top:10px;overflow:hidden;}
+.mod-bar{height:100%;border-radius:999px;background:var(--terra);}
+.mod-done-badge{position:absolute;top:8px;right:8px;background:var(--green);color:white;border-radius:999px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.7rem;}
+.mod-xp-tag{position:absolute;bottom:8px;right:8px;background:rgba(232,184,75,.15);color:var(--gold);border-radius:999px;padding:2px 8px;font-size:.68rem;font-weight:700;}
+.mod-c1{background:linear-gradient(135deg,rgba(212,96,58,.08),rgba(232,184,75,.08));border-color:rgba(212,96,58,.2);}
+.mod-c2{background:linear-gradient(135deg,rgba(123,191,181,.08),rgba(91,155,213,.08));border-color:rgba(123,191,181,.2);}
+.mod-c3{background:linear-gradient(135deg,rgba(107,175,122,.08),rgba(123,191,181,.08));border-color:rgba(107,175,122,.2);}
+.mod-c4{background:linear-gradient(135deg,rgba(91,155,213,.08),rgba(107,175,122,.08));border-color:rgba(91,155,213,.2);}
+.feed{padding:0 20px;display:flex;flex-direction:column;gap:10px;}
+.feed-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
+.feed-item:hover{transform:translateX(4px);border-color:var(--terra);}
+.feed-icon{font-size:1.5rem;flex-shrink:0;}
+.feed-text{font-size:.88rem;line-height:1.5;}
+.feed-text strong{color:var(--terra);font-weight:700;}
+.feed-tag{font-size:.72rem;background:rgba(212,96,58,.1);color:var(--terra);border-radius:999px;padding:2px 8px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+
+/* TRAIL & EVENT */
+.trail-banner{background:linear-gradient(135deg,var(--dark),var(--mid));border-radius:var(--radius);padding:16px;margin:0 20px 12px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .2s;color:var(--cream);}
+.trail-banner:hover{transform:translateY(-2px);}
+.trail-icon{font-size:2rem;flex-shrink:0;}
+.trail-body .trail-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:3px;}
+.trail-body .trail-name{font-family:'Fraunces',serif;font-weight:900;font-size:1rem;}
+.trail-body .trail-sub{font-size:.75rem;opacity:.7;margin-top:2px;}
+.event-banner{border-radius:var(--radius);padding:16px;margin:0 20px 0;position:relative;overflow:hidden;cursor:pointer;color:white;transition:transform .2s;}
+.event-banner:hover{transform:translateY(-2px);}
+.event-stars{position:absolute;top:8px;right:12px;font-size:1.4rem;opacity:.6;animation:wiggle 3s infinite;}
+.event-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;opacity:.8;margin-bottom:4px;}
+.event-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.1rem;}
+.event-sub{font-size:.78rem;opacity:.8;margin-top:4px;}
+.style-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(155,127,212,.1);border:1.5px solid rgba(155,127,212,.3);border-radius:999px;padding:4px 12px;font-size:.72rem;font-weight:700;color:var(--purple);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;padding:12px 0 18px;z-index:200;}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s;padding:6px 10px;border-radius:12px;min-width:68px;min-height:56px;font-size:.78rem;font-weight:700;color:var(--subtext);}
+.nav-item:hover,.nav-item.active{color:var(--terra);}
+.nav-icon{font-size:1.55rem;transition:transform .2s;line-height:1;}
+.nav-item:hover .nav-icon,.nav-item.active .nav-icon{transform:translateY(-2px);}
+
+/* MODULE */
+#screen-module{background:var(--bg);}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:var(--subtext);cursor:pointer;margin-bottom:16px;transition:color .2s;}
+.back-btn:hover{color:var(--terra);}
+.mod-hero{border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--dark),var(--mid));color:var(--cream);margin-bottom:16px;}
+.mod-hero-bg{position:absolute;inset:0;opacity:.15;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,255,255,.05) 20px,rgba(255,255,255,.05) 40px);}
+.mod-hero .big-icon{font-size:3rem;margin-bottom:12px;display:block;}
+.mod-hero h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;margin-bottom:6px;}
+.mod-hero p{font-size:.85rem;opacity:.8;line-height:1.6;}
+.mod-meta{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.mod-meta span{background:rgba(255,255,255,.1);border-radius:999px;padding:4px 12px;font-size:.72rem;font-weight:600;}
+.explain-toggle{display:flex;gap:8px;margin-bottom:16px;}
+.explain-btn{flex:1;padding:8px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;color:var(--subtext);}
+.explain-btn.active{background:var(--dark);color:var(--cream);border-color:var(--dark);}
+.lessons{padding:0 20px;display:flex;flex-direction:column;gap:10px;}
+.lesson-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;}
+.lesson-item:hover{border-color:var(--terra);transform:translateX(4px);}
+.lesson-item.done{border-color:rgba(107,175,122,.3);background:rgba(107,175,122,.04);}
+.lesson-num{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;background:var(--paper);color:var(--text);border:2px solid var(--border);}
+.lesson-item.done .lesson-num{background:var(--green);color:white;border-color:var(--green);}
+.lesson-body{flex:1;}
+.lesson-title{font-weight:700;font-size:.9rem;}
+.lesson-sub{font-size:.75rem;color:var(--subtext);margin-top:2px;}
+.lesson-badge{font-size:.75rem;color:var(--subtext);}
+.lesson-item.done .lesson-badge{color:var(--green);}
+
+/* LESSON */
+#screen-lesson{background:var(--bg);}
+.lesson-wrap{max-width:420px;margin:0 auto;padding:20px 20px 108px;}
+.lesson-progress{margin-bottom:20px;}
+.lp-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--subtext);margin-bottom:6px;}
+.lp-track{height:6px;border-radius:999px;background:var(--border);overflow:hidden;}
+.lp-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .5s;}
+.content-card{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);padding:24px;margin-bottom:16px;}
+.content-icon{font-size:3rem;text-align:center;display:block;margin-bottom:16px;}
+.content-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.4rem;margin-bottom:12px;line-height:1.2;}
+.content-body{font-size:.88rem;line-height:1.8;color:var(--text);}
+.content-body p{margin-bottom:10px;}
+.content-body ul{padding-left:18px;margin-bottom:10px;}
+.content-body li{margin-bottom:6px;}
+.content-tip{background:rgba(123,191,181,.1);border-left:3px solid var(--teal);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 14px;margin-top:12px;font-size:.83rem;}
+.content-warning{background:rgba(212,96,58,.08);border-left:3px solid var(--terra);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 14px;margin-top:12px;font-size:.83rem;}
+.quiz-q{font-family:'Fraunces',serif;font-weight:700;font-size:1.1rem;margin-bottom:16px;line-height:1.4;}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.quiz-opt{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer;font-size:.88rem;font-weight:500;transition:all .2s;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;}
+.quiz-opt:hover{border-color:var(--terra);background:rgba(212,96,58,.04);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(107,175,122,.1);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(212,80,80,.1);color:var(--red);}
+.quiz-feedback{border-radius:var(--radius-sm);padding:14px 16px;font-size:.85rem;line-height:1.5;animation:pop .3s ease;margin-bottom:12px;}
+.quiz-feedback.correct{background:rgba(107,175,122,.1);color:var(--green);border:1.5px solid rgba(107,175,122,.3);}
+.quiz-feedback.wrong{background:rgba(212,80,80,.08);color:var(--red);border:1.5px solid rgba(212,80,80,.2);}
+.sim-phone{border-radius:20px;overflow:hidden;border:1.5px solid var(--border);background:var(--surface);margin-bottom:16px;box-shadow:var(--shadow);}
+.sim-phone-bar{background:var(--mid);padding:10px 14px;display:flex;align-items:center;gap:8px;color:var(--cream);font-size:.8rem;}
+.sim-av{width:28px;height:28px;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.sim-msgs{padding:14px;display:flex;flex-direction:column;gap:8px;}
+.sim-msg{max-width:75%;border-radius:12px;padding:10px 12px;font-size:.82rem;line-height:1.5;}
+.sim-msg.them{background:var(--paper);align-self:flex-start;}
+.sim-msg.me{background:var(--teal);color:white;align-self:flex-end;}
+.sim-link{color:var(--blue);text-decoration:underline;}
+.sim-verdict{display:flex;gap:10px;padding:14px;border-top:1px solid var(--border);}
+.sim-btn{flex:1;padding:12px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface);font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s;}
+.sim-btn.danger{border-color:var(--red);color:var(--red);}
+.sim-btn.danger:hover{background:var(--red);color:white;}
+.sim-btn.safe{border-color:var(--green);color:var(--green);}
+.sim-btn.safe:hover{background:var(--green);color:white;}
+
+/* ERROR PATTERN */
+.error-pattern-card{background:rgba(212,96,58,.06);border:1.5px dashed rgba(212,96,58,.4);border-radius:var(--radius-sm);padding:14px 16px;margin-top:12px;animation:slideUp .3s ease;}
+.epc-label{font-size:.7rem;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.epc-text{font-size:.82rem;line-height:1.5;}
+
+/* AI HINT */
+.ai-hint{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:380px;background:var(--surface);border:1.5px solid var(--teal);border-radius:var(--radius);padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:500;animation:slideUp .4s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:flex-start;gap:12px;}
+.ai-hint-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.ai-hint-body{flex:1;}
+.ai-hint-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal-dark);margin-bottom:4px;}
+.ai-hint-text{font-size:.82rem;line-height:1.5;}
+.ai-hint-actions{display:flex;gap:8px;margin-top:8px;}
+.ai-hint-btn{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;border:1.5px solid var(--teal);color:var(--teal-dark);background:transparent;cursor:pointer;transition:all .2s;}
+.ai-hint-btn:hover{background:var(--teal);color:white;}
+.ai-hint-close{position:absolute;top:10px;right:12px;font-size:.85rem;color:var(--subtext);cursor:pointer;}
+
+/* PROFILE */
+#screen-profile{background:var(--bg);}
+.profile-wrap{max-width:420px;margin:0 auto;padding:20px 20px 108px;}
+.profile-hero{background:linear-gradient(135deg,var(--dark),var(--mid));border-radius:var(--radius);padding:28px 24px;text-align:center;position:relative;overflow:hidden;margin-bottom:20px;color:var(--cream);}
+.profile-blob{position:absolute;width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,var(--terra),var(--gold));top:-60px;right:-40px;opacity:.3;}
+.profile-av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--terra),var(--gold));display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 12px;border:3px solid rgba(255,255,255,.3);position:relative;z-index:1;}
+.profile-name{font-family:'Fraunces',serif;font-weight:900;font-size:1.6rem;position:relative;z-index:1;}
+.profile-level{font-size:.8rem;opacity:.7;margin-top:4px;position:relative;z-index:1;}
+.profile-stats{display:flex;margin-top:20px;border-top:1px solid rgba(255,255,255,.1);padding-top:16px;position:relative;z-index:1;}
+.pstat{flex:1;text-align:center;}
+.pstat-val{font-family:'Fraunces',serif;font-weight:900;font-size:1.4rem;}
+.pstat-label{font-size:.68rem;opacity:.6;margin-top:2px;}
+.pstat+.pstat{border-left:1px solid rgba(255,255,255,.1);}
+.achievements{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.achv-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;transition:all .2s;}
+.achv-item.earned{border-color:rgba(232,184,75,.4);background:rgba(232,184,75,.06);}
+.achv-item .achv-icon{font-size:1.8rem;display:block;margin-bottom:6px;}
+.achv-item .achv-name{font-size:.68rem;font-weight:700;line-height:1.3;}
+.achv-item:not(.earned){opacity:.4;filter:grayscale(1);}
+.pref-section{margin-bottom:16px;}
+.pref-title{font-weight:700;font-size:.82rem;color:var(--subtext);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.pref-row{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:.88rem;font-weight:500;}
+.pref-select{border:none;background:transparent;font-family:inherit;font-size:.85rem;font-weight:600;color:var(--terra);cursor:pointer;outline:none;}
+
+/* RANKING */
+#screen-ranking{background:var(--bg);}
+.ranking-wrap{max-width:420px;margin:0 auto;padding:20px 20px 108px;}
+.rank-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.rank-item.me{border-color:var(--terra);background:rgba(212,96,58,.04);}
+.rank-pos{font-family:'Fraunces',serif;font-weight:900;font-size:1.2rem;width:28px;text-align:center;flex-shrink:0;}
+.rank-pos.gold{color:var(--gold)}.rank-pos.silver{color:#A8A8B0}.rank-pos.bronze{color:#CD7F32}
+.rank-av{width:36px;height:36px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.rank-name{flex:1;font-weight:600;font-size:.88rem;}
+.rank-xp{font-weight:700;font-size:.82rem;color:var(--terra);}
+
+/* POPUPS */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--dark);color:var(--cream);padding:12px 20px;border-radius:999px;font-size:.85rem;font-weight:600;z-index:9998;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.xp-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--surface);border-radius:var(--radius);padding:32px 40px;text-align:center;z-index:9997;box-shadow:0 24px 80px rgba(0,0,0,.2);border:1.5px solid var(--border);transition:transform .4s cubic-bezier(.34,1.56,.64,1);max-width:300px;width:calc(100% - 48px);}
+.xp-popup.show{transform:translate(-50%,-50%) scale(1);}
+.pop-icon{font-size:4rem;display:block;margin-bottom:12px;animation:float 2s ease-in-out infinite;}
+.pop-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;margin-bottom:4px;}
+.pop-xp{font-size:2rem;font-weight:900;color:var(--gold);font-family:'Fraunces',serif;}
+.pop-desc{color:var(--subtext);font-size:.85rem;margin:8px 0 20px;line-height:1.5;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9996;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.mt12{margin-top:12px;}.mt16{margin-top:16px;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px;}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- OVERLAY + XP POPUP -->
+<div class="overlay" id="overlay" onclick="closePopup()"></div>
+<div class="xp-popup" id="xp-popup">
+  <span class="pop-icon" id="pop-icon">⭐</span>
+  <div class="pop-title" id="pop-title">Incrível!</div>
+  <div class="pop-xp" id="pop-xp">+50 XP</div>
+  <p class="pop-desc" id="pop-desc">Lição concluída!</p>
+  <button class="btn-primary" onclick="closePopup()">Continuar →</button>
+</div>
+
+<!-- AI HINT (contextual, non-chat) -->
+<div class="ai-hint" id="ai-hint" style="display:none">
+  <div class="ai-hint-icon">✦</div>
+  <div class="ai-hint-body">
+    <div class="ai-hint-label">Dica Inteligente</div>
+    <div class="ai-hint-text" id="ai-hint-text"></div>
+    <div class="ai-hint-actions">
+      <button class="ai-hint-btn" onclick="expandHint()">Saiba mais</button>
+      <button class="ai-hint-btn" onclick="dismissHint()">Ok!</button>
+    </div>
+  </div>
+  <span class="ai-hint-close" onclick="dismissHint()">✕</span>
+</div>
+
+<!-- ===== WELCOME ===== -->
+<div id="screen-welcome" class="screen active">
+  <div class="blob1"></div><div class="blob2"></div><div class="blob3"></div>
+  <span class="sparkle s1">✦</span><span class="sparkle s2">★</span>
+  <span class="sparkle s3">✦</span><span class="sparkle s4">★</span>
+  <div class="welcome-content">
+    <div class="logo-badge"><span class="logo-dot"></span>Plataforma Educativa</div>
+    <div class="welcome-title">
+      <span class="outline">NET</span>
+      <span class="fill">SAFE</span>
+      <span class="script">na internet</span>
+    </div>
+    <p class="welcome-sub" id="welcome-sub-text">Aprenda a navegar com segurança, senso crítico e inteligência. Do jeito certo pra você.</p>
+    <button class="btn-primary" onclick="goScreen('screen-onboard')">Começar agora →</button>
+    <div class="mt16">
+      <button class="btn-secondary" onclick="loadExistingProfile()" style="font-size:.82rem;padding:10px 20px">Já tenho perfil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ONBOARD ===== -->
+<div id="screen-onboard" class="screen">
+  <div class="ob-blob ob-b1"></div><div class="ob-blob ob-b2"></div>
+  <div class="onboard-wrap">
+    <div class="ob-progress">
+      <div class="ob-dot done" id="dot-0"></div>
+      <div class="ob-dot" id="dot-1"></div>
+      <div class="ob-dot" id="dot-2"></div>
+      <div class="ob-dot" id="dot-3"></div>
+    </div>
+    <!-- Step 0 -->
+    <div class="ob-step active" id="ob-0">
+      <div class="ob-step-num">Passo 1 de 4</div>
+      <div class="ob-title">Qual é a sua faixa etária?</div>
+      <div class="ob-sub">Isso personaliza linguagem, exemplos e conteúdo pra você.</div>
+      <div class="age-grid">
+        <div class="age-card" onclick="selectAge('8-11',this)"><span class="age-emoji">🧒</span><span class="age-range">8–11 anos</span><span class="age-label">Explorador</span></div>
+        <div class="age-card" onclick="selectAge('12-14',this)"><span class="age-emoji">😎</span><span class="age-range">12–14 anos</span><span class="age-label">Digital Nativo</span></div>
+        <div class="age-card" onclick="selectAge('15-17',this)"><span class="age-emoji">🚀</span><span class="age-range">15–17 anos</span><span class="age-label">Conectado</span></div>
+        <div class="age-card" onclick="selectAge('18-21',this)"><span class="age-emoji">💡</span><span class="age-range">18–21 anos</span><span class="age-label">Jovem Adulto</span></div>
+      </div>
+      <button class="btn-primary btn-full" onclick="nextOb(1)">Continuar →</button>
+    </div>
+    <!-- Step 1 -->
+    <div class="ob-step" id="ob-1">
+      <div class="ob-step-num">Passo 2 de 4</div>
+      <div class="ob-title">Como quer ser chamado?</div>
+      <div class="ob-sub">Crie seu perfil personalizado.</div>
+      <input class="ob-input" id="ob-name" type="text" placeholder="Seu nome ou apelido..." maxlength="20">
+      <div class="ob-sub" style="margin:0 0 10px">Escolha um avatar:</div>
+      <div class="avatar-grid">
+        <div class="avatar-item selected" onclick="selectAvatar('🦊',this)">🦊</div>
+        <div class="avatar-item" onclick="selectAvatar('🐼',this)">🐼</div>
+        <div class="avatar-item" onclick="selectAvatar('🦋',this)">🦋</div>
+        <div class="avatar-item" onclick="selectAvatar('🐸',this)">🐸</div>
+        <div class="avatar-item" onclick="selectAvatar('🦁',this)">🦁</div>
+        <div class="avatar-item" onclick="selectAvatar('🐙',this)">🐙</div>
+        <div class="avatar-item" onclick="selectAvatar('🦄',this)">🦄</div>
+        <div class="avatar-item" onclick="selectAvatar('🐲',this)">🐲</div>
+      </div>
+      <button class="btn-primary btn-full" onclick="nextOb(2)">Continuar →</button>
+    </div>
+    <!-- Step 2 -->
+    <div class="ob-step" id="ob-2">
+      <div class="ob-step-num">Passo 3 de 4</div>
+      <div class="ob-title">Estilo e preferências</div>
+      <div class="ob-sub">Personalize sua experiência visual.</div>
+      <div class="theme-grid">
+        <div class="theme-card selected" onclick="selectTheme('default',this)"><div class="theme-swatch" style="background:linear-gradient(135deg,#D4603A,#E8B84B)"></div><div class="theme-label">Terra</div></div>
+        <div class="theme-card" onclick="selectTheme('pastel',this)"><div class="theme-swatch" style="background:linear-gradient(135deg,#E8967A,#9DD6CE)"></div><div class="theme-label">Pastel</div></div>
+        <div class="theme-card" onclick="selectTheme('dark',this)"><div class="theme-swatch" style="background:linear-gradient(135deg,#1A1612,#3D3530)"></div><div class="theme-label">Dark</div></div>
+      </div>
+      <div class="pref-item"><span>🎵 Música ambiente</span><div class="toggle on" id="tog-music" onclick="this.classList.toggle('on')"></div></div>
+      <div class="pref-item"><span>🔊 Efeitos sonoros</span><div class="toggle on" id="tog-sfx" onclick="this.classList.toggle('on')"></div></div>
+      <div class="pref-item"><span>💡 Dicas inteligentes</span><div class="toggle on" id="tog-hints-ob" onclick="this.classList.toggle('on')"></div></div>
+      <button class="btn-primary btn-full" onclick="nextOb(3)" style="margin-top:8px">Continuar →</button>
+    </div>
+    <!-- Step 3 -->
+    <div class="ob-step" id="ob-3">
+      <div class="ob-step-num">Passo 4 de 4</div>
+      <div class="ob-title">Tudo pronto,<br><em id="ob-preview-name" style="color:var(--terra)">Aventureiro</em>!</div>
+      <div class="ob-sub" id="ob-ready-text" style="font-size:.95rem">Sua jornada de letramento digital começa agora!</div>
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;text-align:center;">
+        <div id="ob-final-av" style="font-size:3rem;margin-bottom:8px">🦊</div>
+        <div id="ob-final-name" style="font-family:'Fraunces',serif;font-weight:900;font-size:1.3rem"></div>
+        <div style="font-size:.78rem;color:var(--subtext);margin-top:4px" id="ob-final-age"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <span style="background:rgba(212,96,58,.1);color:var(--terra);border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:700">Nível 1 · Aprendiz</span>
+          <span id="ob-lang-badge" style="background:rgba(123,191,181,.1);color:var(--teal-dark);border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:700">Linguagem: Simples</span>
+        </div>
+      </div>
+      <button class="btn-primary btn-full" onclick="finishOnboard()">Entrar na plataforma 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="screen-app" class="screen">
+  <div class="app-wrap">
+    <div class="topbar">
+      <div class="topbar-logo">Net<span>Safe</span> ✦</div>
+      <div class="topbar-actions">
+        <div class="xp-badge">⚡ <span id="xp-display">0</span> XP</div>
+        <div class="avatar-mini" id="topbar-avatar" onclick="goScreen('screen-profile')">🦊</div>
+      </div>
+    </div>
+    <div class="xpbar-wrap">
+      <div class="xpbar-label"><span id="level-label">Nível 1 — Aprendiz</span><span id="xp-next-label">0/100</span></div>
+      <div class="xpbar-track"><div class="xpbar-fill" id="xpbar-fill" style="width:0%"></div></div>
+    </div>
+    <div class="sec-head" style="padding-bottom:6px">
+      <div class="sec-title" id="home-section-title">Início</div>
+      <div class="style-badge" id="style-badge">🎯 Explorador</div>
+    </div>
+    <!-- Event Banner -->
+    <div class="event-banner" id="event-banner" onclick="startEvent()" style="display:none">
+      <div class="event-stars">★★</div>
+      <div class="event-label">⚡ Evento Especial</div>
+      <div class="event-title" id="event-title">Semana Anti-Phishing</div>
+      <div class="event-sub" id="event-sub">Desafios extras com XP em dobro!</div>
+    </div>
+    <!-- Hero -->
+    <div class="hero" style="padding-top:12px">
+      <div class="hero-greeting" id="hero-greeting">Olá de volta,</div>
+      <div class="hero-name" id="hero-name">pronto pra <em>aprender</em>?</div>
+      <div class="hero-card" onclick="startMissionDay()">
+        <div class="hero-card-blob"></div>
+        <div class="hero-tag" id="mission-tag">🎯 Missão do Dia</div>
+        <h3 id="mission-title">Golpes no WhatsApp</h3>
+        <p id="mission-desc">Aprenda a identificar mensagens suspeitas</p>
+        <div class="hero-card-cta">Iniciar missão →</div>
+      </div>
+    </div>
+    <!-- Adaptive Trail -->
+    <div class="sec-head" style="padding-bottom:6px"><div class="sec-title">Trilha Recomendada</div></div>
+    <div class="trail-banner" id="trail-banner" onclick="startTrail()">
+      <div class="trail-icon" id="trail-icon">🛣️</div>
+      <div class="trail-body">
+        <div class="trail-label">Baseado no seu desempenho</div>
+        <div class="trail-name" id="trail-name">Trilha Iniciante</div>
+        <div class="trail-sub" id="trail-sub">Comece pelos fundamentos</div>
+      </div>
+    </div>
+    <div class="sec-head"><div class="sec-title">Módulos</div><div class="sec-link" onclick="goScreen('screen-ranking')">🏆 Ranking</div></div>
+    <div class="modules-grid" id="modules-grid"></div>
+    <div class="sec-head"><div class="sec-title" id="tips-title">Dicas Rápidas</div></div>
+    <div class="feed" id="feed-container"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="setNav(this);goScreen('screen-app')"><span class="nav-icon">🏠</span>Início</div>
+    <div class="nav-item" onclick="setNav(this);openFirstModule()"><span class="nav-icon">📚</span>Módulos</div>
+    <div class="nav-item" onclick="setNav(this);goScreen('screen-ranking')"><span class="nav-icon">🏆</span>Ranking</div>
+    <div class="nav-item" onclick="setNav(this);goScreen('screen-profile')"><span class="nav-icon">👤</span>Perfil</div>
+  </div>
+</div>
+
+<!-- ===== MODULE DETAIL ===== -->
+<div id="screen-module" class="screen">
+  <div class="app-wrap">
+    <div style="padding:20px 20px 0">
+      <div class="back-btn" onclick="goScreen('screen-app')">← Voltar</div>
+      <div class="mod-hero">
+        <div class="mod-hero-bg"></div>
+        <span class="big-icon" id="mod-big-icon">🔐</span>
+        <h2 id="mod-detail-title">Módulo</h2>
+        <p id="mod-detail-desc"></p>
+        <div class="mod-meta">
+          <span id="mod-lessons-count">5 lições</span>
+          <span id="mod-xp-total">+250 XP</span>
+          <span id="mod-diff-tag">Nível: Intermediário</span>
+        </div>
+      </div>
+      <div class="explain-toggle" id="explain-toggle">
+        <button class="explain-btn active" onclick="setExplainMode('normal',this)">📖 Normal</button>
+        <button class="explain-btn" onclick="setExplainMode('deep',this)">🔬 Aprofundado</button>
+        <button class="explain-btn" onclick="setExplainMode('quick',this)">⚡ Resumo</button>
+      </div>
+    </div>
+    <div class="lessons" id="lessons-list"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goScreen('screen-app')"><span class="nav-icon">🏠</span>Início</div>
+    <div class="nav-item active"><span class="nav-icon">📚</span>Módulos</div>
+    <div class="nav-item" onclick="goScreen('screen-ranking')"><span class="nav-icon">🏆</span>Ranking</div>
+    <div class="nav-item" onclick="goScreen('screen-profile')"><span class="nav-icon">👤</span>Perfil</div>
+  </div>
+</div>
+
+<!-- ===== LESSON ===== -->
+<div id="screen-lesson" class="screen">
+  <div class="lesson-wrap">
+    <div class="back-btn" onclick="leaveLesson()">← Voltar</div>
+    <div class="lesson-progress">
+      <div class="lp-label"><span id="step-label">Conteúdo</span><span id="step-xp">+50 XP</span></div>
+      <div class="lp-track"><div class="lp-fill" id="lp-fill" style="width:50%"></div></div>
+    </div>
+    <div id="lesson-content"></div>
+    <div id="lesson-actions"></div>
+  </div>
+</div>
+
+<!-- ===== PROFILE ===== -->
+<div id="screen-profile" class="screen">
+  <div class="profile-wrap">
+    <div class="back-btn" onclick="goScreen('screen-app')">← Voltar</div>
+    <div class="profile-hero">
+      <div class="profile-blob"></div>
+      <div class="profile-av" id="profile-av">🦊</div>
+      <div class="profile-name" id="profile-name">Aventureiro</div>
+      <div class="profile-level" id="profile-level">Nível 1 — Aprendiz</div>
+      <div class="profile-stats">
+        <div class="pstat"><div class="pstat-val" id="stat-xp">0</div><div class="pstat-label">XP Total</div></div>
+        <div class="pstat"><div class="pstat-val" id="stat-done">0</div><div class="pstat-label">Lições</div></div>
+        <div class="pstat"><div class="pstat-val" id="stat-streak">1</div><div class="pstat-label">Sequência</div></div>
+      </div>
+    </div>
+    <div class="sec-head" style="padding:0 0 10px"><div class="sec-title">Conquistas</div></div>
+    <div class="achievements" id="achievements-grid"></div>
+    <div class="sec-head" style="padding:16px 0 10px"><div class="sec-title">Perfil de Aprendizado</div></div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:16px;">
+      <div style="font-size:.75rem;color:var(--subtext);margin-bottom:8px">Estilo detectado automaticamente:</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:1.5rem" id="ls-icon">🎯</span>
+        <div>
+          <div style="font-weight:700;font-size:.9rem" id="ls-name">Explorador</div>
+          <div style="font-size:.75rem;color:var(--subtext)" id="ls-desc">Gosta de desafios e conteúdo direto</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px">
+        <div style="font-size:.72rem;font-weight:700;color:var(--subtext);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Tópicos para revisar</div>
+        <div id="error-patterns" style="font-size:.82rem;color:var(--text);line-height:1.6">Nenhum padrão registrado ainda.</div>
+      </div>
+    </div>
+    <div class="sec-head" style="padding:0 0 10px"><div class="sec-title">Preferências</div></div>
+    <div class="pref-section">
+      <div class="pref-title">Linguagem & Conteúdo</div>
+      <div class="pref-row"><span>🗣️ Nível de linguagem</span>
+        <select class="pref-select" id="lang-select" onchange="setLangLevel(this.value)">
+          <option value="auto">Auto (por idade)</option>
+          <option value="simple">Simples</option>
+          <option value="normal">Normal</option>
+          <option value="deep">Aprofundado</option>
+        </select>
+      </div>
+      <div class="pref-row"><span>💡 Dicas inteligentes (IA)</span><div class="toggle on" id="tog-hints" onclick="this.classList.toggle('on')"></div></div>
+      <div class="pref-row"><span>🔬 Modo aprofundado padrão</span><div class="toggle" id="tog-deep" onclick="this.classList.toggle('on');toggleDeepDefault()"></div></div>
+    </div>
+    <div class="pref-section">
+      <div class="pref-title">Aparência</div>
+      <div class="pref-row"><span>🎨 Tema</span>
+        <select class="pref-select" id="theme-select" onchange="applyTheme(this.value)">
+          <option value="default">Terra</option>
+          <option value="pastel">Pastel</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <div class="pref-row"><span>🔤 Fonte grande</span><div class="toggle" id="tog-font" onclick="this.classList.toggle('on');toggleFont()"></div></div>
+    </div>
+    <div class="pref-section">
+      <div class="pref-title">Conta</div>
+      <div class="pref-row" style="cursor:pointer" onclick="switchProfile()"><span>👤 Trocar perfil</span><span style="color:var(--subtext);font-size:.8rem">→</span></div>
+      <div class="pref-row" style="cursor:pointer" onclick="resetProfile()"><span style="color:var(--red)">🗑️ Resetar progresso</span><span style="color:var(--red);font-size:.8rem">→</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RANKING ===== -->
+<div id="screen-ranking" class="screen">
+  <div class="ranking-wrap">
+    <div class="back-btn" onclick="goScreen('screen-app')">← Voltar</div>
+    <div style="font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;margin-bottom:4px">🏆 Ranking</div>
+    <div style="color:var(--subtext);font-size:.82rem;margin-bottom:20px">Compare seu progresso</div>
+    <div id="ranking-list"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goScreen('screen-app')"><span class="nav-icon">🏠</span>Início</div>
+    <div class="nav-item" onclick="openFirstModule()"><span class="nav-icon">📚</span>Módulos</div>
+    <div class="nav-item active"><span class="nav-icon">🏆</span>Ranking</div>
+    <div class="nav-item" onclick="goScreen('screen-profile')"><span class="nav-icon">👤</span>Perfil</div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// DATA LAYER — Age-Adapted Content System
+// ================================================================
+const LEVELS=[
+  {min:0,max:100,name:'Aprendiz',icon:'🌱'},
+  {min:100,max:250,name:'Explorador',icon:'🔍'},
+  {min:250,max:500,name:'Guardião',icon:'🛡️'},
+  {min:500,max:900,name:'Detetive',icon:'🕵️'},
+  {min:900,max:1500,name:'Mestre',icon:'⚡'},
+  {min:1500,max:9999,name:'Lenda',icon:'🌟'},
+];
+
+// Age language profiles — drives ALL text adaptation
+const LP={
+  '8-11':{
+    langKey:'simple',
+    greeting:n=>`${n}, bora explorar a internet com segurança? 🦊`,
+    missionTag:'🎮 Missão Especial',
+    correct:['Isso mesmo! Você é incrível! 🎉','Acertou! Você arrasou! ⭐','Muito bem! Continue assim! 🚀','Perfeito! Você é um detetive digital! 🔍'],
+    wrong:['Quase lá! Não desiste 💪','Hmm, tenta de novo! Você consegue 😊','Opa! Dá uma olhada na explicação abaixo 👇','Não foi dessa vez, mas você tá aprendendo! 🌱'],
+    simPrompt:'O que você faria com essa mensagem?',
+    tipsSectionTitle:'Dicas para Você!',
+    explainExtra:'Quer dizer... Veja a explicação com calma! Não tem pressa 😊',
+    hintStyle:'encorajador',
+    langBadge:'Simples e Visual',
+    readyText:'Você vai aprender sobre segurança na internet de um jeito divertido, com missões e desafios! 🎮',
+  },
+  '12-14':{
+    langKey:'normal',
+    greeting:n=>`E aí, ${n}? O que você vai aprender hoje?`,
+    missionTag:'🎯 Missão do Dia',
+    correct:['Certo! Você mandou bem! ✅','Exatamente isso! 🙌','Perfeito! Segue em frente!','Isso aí! Boa jogada 😎'],
+    wrong:['Errou dessa vez, mas sem drama. Veja a explicação!','Não foi dessa vez — relê o conteúdo e tenta de novo!','Quase! Confere a dica abaixo 👇','Ops! Mas é fácil de entender — veja a explicação.'],
+    simPrompt:'Analise a situação: o que você faria?',
+    tipsSectionTitle:'Dicas Rápidas',
+    explainExtra:'Tenta o modo "Aprofundado" no módulo para ver mais detalhes!',
+    hintStyle:'amigável',
+    langBadge:'Descontraído',
+    readyText:'Você vai aprender sobre segurança online, fake news, redes sociais e IA — de um jeito que faz sentido pra você!',
+  },
+  '15-17':{
+    langKey:'normal',
+    greeting:n=>`Bem-vindo de volta, ${n}.`,
+    missionTag:'⚡ Desafio do Dia',
+    correct:['Correto! Bom raciocínio.','Certo — você entendeu a lógica.','Boa análise!','Assertivo. Continue.'],
+    wrong:['Incorreto. Revise o conteúdo.','Não exatamente. A explicação abaixo clarifica.','Errou. Veja a justificativa — é importante.','Não. Releia com atenção.'],
+    simPrompt:'Analise criticamente: é seguro ou suspeito?',
+    tipsSectionTitle:'Dicas Práticas',
+    explainExtra:'Use o modo "Aprofundado" para ver mais contexto técnico.',
+    hintStyle:'direto',
+    langBadge:'Direto ao Ponto',
+    readyText:'Conteúdo direto sobre segurança digital, privacidade e pensamento crítico. Sem enrolação.',
+  },
+  '18-21':{
+    langKey:'deep',
+    greeting:n=>`Olá, ${n}. Pronto para aprofundar seu letramento digital?`,
+    missionTag:'📊 Análise do Dia',
+    correct:['Correto. Boa análise crítica.','Assertivo — você demonstrou compreensão do conceito.','Certo. Vale aprofundar no tema.','Análise correta.'],
+    wrong:['Resposta incorreta. Analise a justificativa com atenção.','Incorreto — a explicação contextualiza as nuances.','Não. Revise a lógica na explicação.','Resposta incorreta. Veja a análise abaixo.'],
+    simPrompt:'Analise o cenário considerando vetores de ataque e contexto social:',
+    tipsSectionTitle:'Insights',
+    explainExtra:'O modo "Aprofundado" inclui referências acadêmicas e jurídicas.',
+    hintStyle:'analítico',
+    langBadge:'Analítico',
+    readyText:'Plataforma de letramento digital com abordagem analítica: segurança, privacidade, desinformação e IA sob perspectiva crítica.',
+  },
+};
+
+const MODULES=[
+  {id:'security',icon:'🔐',title:'Segurança Online',color:'mod-c1',xp:250,
+   lessons:[
+    {id:'s1',title:'Senhas Fortes',sub:'Como criar senhas que protegem de verdade',icon:'🔑',type:'content',xp:40},
+    {id:'s2',title:'Verificação em Duas Etapas',sub:'A camada extra de proteção',icon:'📲',type:'quiz',xp:50},
+    {id:'s3',title:'Phishing: Reconheça Golpes',sub:'Links falsos e mensagens armadilha',icon:'🎣',type:'sim',xp:60},
+    {id:'s4',title:'Proteção de Dados',sub:'O que compartilhar e o que não',icon:'🗄️',type:'quiz',xp:50},
+    {id:'s5',title:'Desafio Final',sub:'Quiz completo de segurança',icon:'🏆',type:'quiz',xp:50},
+   ]},
+  {id:'fakenews',icon:'📰',title:'Fake News',color:'mod-c2',xp:200,
+   lessons:[
+    {id:'f1',title:'Tipos de Desinformação',sub:'Entenda as formas de notícia falsa',icon:'❓',type:'content',xp:40},
+    {id:'f2',title:'Como Verificar Fontes',sub:'Ferramentas para checar notícias',icon:'🔎',type:'quiz',xp:50},
+    {id:'f3',title:'Simulação: Viralizou!',sub:'Decida o que compartilhar',icon:'📱',type:'sim',xp:60},
+    {id:'f4',title:'Desafio: Real ou Fake?',sub:'Quiz de identificação',icon:'🎯',type:'quiz',xp:50},
+   ]},
+  {id:'social',icon:'📱',title:'Redes Sociais',color:'mod-c3',xp:220,
+   lessons:[
+    {id:'r1',title:'Pegadas Digitais',sub:'O que você deixa na internet',icon:'👣',type:'content',xp:40},
+    {id:'r2',title:'Perfis Falsos',sub:'Como identificar fakes e bots',icon:'🎭',type:'quiz',xp:50},
+    {id:'r3',title:'Simulação: Pedido Suspeito',sub:'Mensagem de desconhecido',icon:'💬',type:'sim',xp:60},
+    {id:'r4',title:'Privacidade nas Redes',sub:'Configurações que protegem você',icon:'🔒',type:'content',xp:40},
+    {id:'r5',title:'Desafio Final',sub:'Quiz de redes sociais',icon:'🏆',type:'quiz',xp:30},
+   ]},
+  {id:'ai',icon:'🤖',title:'IA e Deepfakes',color:'mod-c4',xp:230,
+   lessons:[
+    {id:'a1',title:'O que é Inteligência Artificial?',sub:'Explicação clara e direta',icon:'🧠',type:'content',xp:40},
+    {id:'a2',title:'Deepfakes Explicados',sub:'Vídeos e áudios gerados por IA',icon:'🎬',type:'content',xp:40},
+    {id:'a3',title:'Simulação: É Real?',sub:'Analise conteúdos suspeitos',icon:'🔬',type:'sim',xp:60},
+    {id:'a4',title:'Desafio: Humano ou IA?',sub:'Quiz de identificação',icon:'🎯',type:'quiz',xp:50},
+    {id:'a5',title:'IA na Sociedade',sub:'Impactos, riscos e oportunidades',icon:'🌐',type:'quiz',xp:40},
+   ]},
+];
+
+// ----------------------------------------------------------------
+// AGE-ADAPTED CONTENT — title/body/tip/warning per langKey
+// ----------------------------------------------------------------
+const CONTENT={
+  s1:{icon:'🔑',
+    title:{simple:'Senhas: Sua Chave Secreta!',normal:'Senhas Fortes: Sua Primeira Linha de Defesa',deep:'Segurança de Credenciais: Anatomia de uma Senha Robusta'},
+    body:{
+      simple:'<p>Imagina que a sua senha é a chave da sua casa. Uma chave fraca qualquer um consegue copiar!</p><p><strong>Uma boa senha precisa ter:</strong><br>✅ Pelo menos 8 letras e números<br>✅ Letras maiúsculas e minúsculas<br>✅ Um símbolo especial (#, @, !)</p><p><strong>Ruim:</strong> "gato123"<br><strong>Boa:</strong> "MeuGato@3Patas!"</p>',
+      normal:'<p>Uma senha fraca é como uma porta sem tranca. Em 2023, "123456" e "senha" ainda eram as mais usadas no Brasil — hackers testam exatamente essas primeiro.</p><ul><li>Mínimo 12 caracteres</li><li>Mistura de maiúsculas e minúsculas</li><li>Números e símbolos (#, @, !, $)</li><li>Sem dados pessoais (nome, data de nascimento)</li></ul>',
+      deep:'<p>A segurança de senhas é um problema de entropia computacional. Ataques de força bruta modernos testam bilhões de combinações por segundo via GPU. A eficácia de uma senha é medida em bits de entropia.</p><ul><li><strong>Comprimento:</strong> Cada caractere adicional multiplica exponencialmente o espaço de busca</li><li><strong>Charset:</strong> 95 caracteres ASCII imprimíveis maximizam entropia por caractere</li><li><strong>Aleatoriedade:</strong> Padrões previsíveis (l33tsp3ak, datas) são vulneráveis a ataques de dicionário</li><li><strong>Unicidade:</strong> Reutilização de senha multiplica a superfície de ataque por N serviços</li></ul>',
+    },
+    tip:{
+      simple:'<strong>Dica mágica:</strong> Pense numa frase que só você sabe: "MeuCachorro@ChamaRex!" — fácil de lembrar, difícil de adivinhar!',
+      normal:'<strong>Dica:</strong> Use frases como senha: "MinhaGato@tem3Patas!" é memorável e forte. Gerenciadores (Bitwarden, 1Password) resolvem a memorização.',
+      deep:'<strong>Best practice:</strong> Gerenciador de senhas com geração criptográfica (Bitwarden, KeePass). Habilite MFA em todos os serviços críticos. Monitore vazamentos em haveibeenpwned.com.',
+    },
+    warning:{
+      simple:'<strong>Nunca!</strong> Use a mesma senha em dois lugares. Se alguém descobrir uma, pega todas!',
+      normal:'<strong>Atenção:</strong> Nunca reutilize senhas. Se um site vazar, todos os outros ficam comprometidos.',
+      deep:'<strong>Threat model:</strong> Credential stuffing explora reuso de senhas em vazamentos (Have I Been Pwned lista >12B de credenciais comprometidas). Cada serviço deve ter credencial única e aleatória.',
+    },
+  },
+  f1:{icon:'📰',
+    title:{simple:'Notícia Falsa: Como Reconhecer!',normal:'Desinformação: Os Tipos de Notícias Falsas',deep:'Ecossistema da Desinformação: Taxonomia e Mecanismos de Propagação'},
+    body:{
+      simple:'<p>Sabe quando alguém manda uma mensagem que parece exagerada demais? Pode ser mentira!</p><p><strong>Tipos de mentiras na internet:</strong><br>📰 Notícia inventada do zero<br>😈 Foto real com legenda errada<br>😂 Piada que as pessoas levam a sério</p><p><strong>Sinais de alerta:</strong><br>🚨 "Compartilhe antes que apaguem!"<br>🚨 Palavras em CAPS LOCK<br>🚨 Muitos erros de português</p>',
+      normal:'<p>Nem toda informação falsa é "fake news" no mesmo sentido. Entender os tipos ajuda a combater melhor.</p><ul><li><strong>Desinformação:</strong> Conteúdo falso criado com intenção de enganar</li><li><strong>Malinformação:</strong> Informação verdadeira usada de forma prejudicial</li><li><strong>Conteúdo enganoso:</strong> Dados reais apresentados de forma distorcida</li><li><strong>Sátira/paródia:</strong> Humor mal interpretado como real</li></ul>',
+      deep:'<p>A desinformação opera como ecossistema com atores, infraestrutura e incentivos distintos. O modelo FIMI categoriza ameaças em vetores de narrativa, canal e audiência.</p><ul><li><strong>Sátira/paródia:</strong> Intenção não-maliciosa, potencial de dano acidental</li><li><strong>Conteúdo impostor:</strong> Falsificação de fontes genuínas</li><li><strong>Conteúdo fabricado:</strong> 100% falso, projetado para enganar</li><li><strong>Conteúdo manipulado:</strong> Informação ou imagem genuína manipulada para novo contexto</li></ul>',
+    },
+    tip:{
+      simple:'<strong>Regra de ouro:</strong> Se a notícia deixou você com raiva ou muito animado, PARA! Emoções fortes fazem compartilhar sem pensar.',
+      normal:'<strong>Regra de ouro:</strong> Antes de compartilhar, pergunte: "Eu checaria isso se fosse importante?" Se não, não compartilhe.',
+      deep:'<strong>Framework SIFT:</strong> Stop (pare antes de reagir), Investigate the source, Find better coverage, Trace claims to original source.',
+    },
+    warning:{
+      simple:'<strong>Atenção:</strong> Palavras como "urgente", "compartilhe agora" ou "estão tentando esconder" são sinais de notícia falsa!',
+      normal:'<strong>Cuidado:</strong> Emoções fortes (raiva, medo, euforia) nos fazem compartilhar sem pensar. Desconfie de conteúdo que provoca reação intensa.',
+      deep:'<strong>Viés de confirmação:</strong> Pesquisas de Pennycook & Rand (2019) demonstram que processamento intuitivo (Sistema 1) é o principal motor de propagação, não má-fé. Práticas analíticas reduzem suscetibilidade.',
+    },
+  },
+  r1:{icon:'👣',
+    title:{simple:'Pegadas na Internet: O que Você Deixa Online?',normal:'Pegadas Digitais: O Que Você Deixa na Internet',deep:'Rastro Digital e Vigilância de Dados: Implicações para Privacidade'},
+    body:{
+      simple:'<p>Quando você anda na praia, deixa pegadas na areia. Na internet é igual!</p><p><strong>O que fica registrado:</strong><br>🔍 O que você pesquisou<br>❤️ As fotos que curtiu<br>📍 Os lugares que visitou<br>⏰ O horário que você acessa</p>',
+      normal:'<p>Cada ação online deixa rastros. Pesquisa, curtida, compra — tudo é registrado.</p><ul><li><strong>Pegadas ativas:</strong> O que você posta, curte, comenta conscientemente</li><li><strong>Pegadas passivas:</strong> Dados coletados sem você perceber (localização, hora, dispositivo, IP)</li></ul>',
+      deep:'<p>O rastro digital é subproduto inevitável da participação em serviços digitais, coletado e monetizado por plataformas, data brokers, anunciantes e governos.</p><ul><li><strong>Metadados de comunicação:</strong> Quem, quando, onde — não o conteúdo, mas o padrão</li><li><strong>Perfil comportamental:</strong> Inferência de intenções, psicografia e vulnerabilidades</li><li><strong>Dado inferido:</strong> Informações deduzidas que você nunca forneceu explicitamente</li></ul>',
+    },
+    tip:{
+      simple:'<strong>Dica:</strong> Antes de postar, pense: "Essa foto mostra minha casa ou escola?" Se sim, cuidado!',
+      normal:'<strong>Verifique agora:</strong> Busque seu nome no Google. O que aparece? Qualquer pessoa pode ver isso.',
+      deep:'<strong>Prática:</strong> Audite permissões de app, revise OAuth tokens, use Privacy Badger e DNS-over-HTTPS.',
+    },
+    warning:{
+      simple:'<strong>Lembra:</strong> Na internet, "deletar" não significa sumir de verdade! Alguém pode ter salvo antes.',
+      normal:'<strong>Lembre-se:</strong> Na internet, "deletar" raramente é permanente. Pense antes de postar.',
+      deep:'<strong>Right to be forgotten (LGPD):</strong> Apesar do Art. 18, dados replicados em sistemas de terceiros raramente são eliminados completamente. Prevenção é mais eficaz que remediação.',
+    },
+  },
+  r4:{icon:'🔒',
+    title:{simple:'Como Deixar seu Perfil Mais Seguro',normal:'Privacidade nas Redes: Configurações que Protegem',deep:'Gestão de Privacidade em Plataformas: Configurações e LGPD'},
+    body:{
+      simple:'<p><strong>Configurações importantes:</strong><br>🔒 Perfil no modo privado<br>👀 Aceitar só quem você conhece<br>📍 Não colocar localização nas fotos<br>✋ Controlar quem pode te marcar</p>',
+      normal:'<p>As configurações padrão das redes favorecem exposição, não privacidade.</p><ul><li>Perfil privado (apenas seguidores aprovados)</li><li>Desativar localização em postagens</li><li>Revisar apps conectados à sua conta</li><li>Limitar quem pode te marcar em fotos</li></ul>',
+      deep:'<p>A privacidade por padrão (privacy by default) é princípio do GDPR (Art. 25) e da LGPD. Plataformas são incentivadas a maximizar coleta de dados.</p><ul><li><strong>Third-party data sharing:</strong> Desativar compartilhamento com parceiros de publicidade</li><li><strong>Activity-based targeting:</strong> Opt-out de personalização por comportamento externo</li><li><strong>Inferência sensível:</strong> Desativar inferência de dados de saúde, política e religião</li></ul>',
+    },
+    tip:{
+      simple:'<strong>Faça agora!</strong> Abre as configurações de privacidade de uma rede social e coloca no modo privado!',
+      normal:'<strong>Faça agora:</strong> Abra as configurações de privacidade e revise quem pode ver suas postagens.',
+      deep:'<strong>Auditoria:</strong> Instagram: Settings > Privacy. Meta: Off-Facebook Activity tool. Google: myaccount.google.com/data-and-privacy.',
+    },
+    warning:{
+      simple:'<strong>Perigo!</strong> Nunca poste em tempo real onde você está. Espera chegar em casa!',
+      normal:'<strong>Atenção:</strong> Nunca revele localização em tempo real, fachada da casa ou rotinas previsíveis.',
+      deep:'<strong>OPSEC:</strong> Informações fragmentadas são agregáveis via OSINT. Privacidade operacional exige pensar em metadados, não apenas em conteúdo explícito.',
+    },
+  },
+  a1:{icon:'🧠',
+    title:{simple:'O que é Inteligência Artificial? (Simples!)',normal:'Inteligência Artificial: O Que É e Como Funciona',deep:'Fundamentos de Machine Learning e Seus Vetores de Risco'},
+    body:{
+      simple:'<p>IA é um programa que aprende com exemplos — como um aluno, mas bilhões de vezes mais rápido!</p><p><strong>IA no seu dia a dia:</strong><br>🎵 Spotify escolhe músicas que você gosta<br>📸 TikTok decide qual vídeo aparece<br>😊 A câmera reconhece seu rosto</p>',
+      normal:'<p>IA aprende com dados para realizar tarefas que exigiriam inteligência humana — reconhecer rostos, traduzir textos, recomendar conteúdo.</p><ul><li>Feed do Instagram e TikTok (decide o que você vê)</li><li>Spotify e YouTube (recomendações)</li><li>Filtros de câmera (troca rosto, maquiagem virtual)</li></ul>',
+      deep:'<p>Machine Learning opera por otimização estatística em grandes datasets. Modelos aprendem representações latentes de padrões sem programação explícita de regras.</p><ul><li><strong>Sistemas de recomendação:</strong> Maximizam engajamento (proxy do interesse), criando câmaras de eco</li><li><strong>Computer Vision:</strong> Base dos deepfakes e reconhecimento facial — com implicações de vigilância</li><li><strong>NLP/LLMs:</strong> Geração de texto convincente para phishing personalizado em escala</li></ul>',
+    },
+    tip:{
+      simple:'<strong>Lembra:</strong> A IA não tem sentimentos nem sabe o que é certo ou errado. Ela só faz o que foi programada pra fazer!',
+      normal:'<strong>Importante:</strong> IA não pensa — processa padrões. Ela pode errar, ter vieses e ser usada de forma antiética.',
+      deep:'<strong>Limitação fundamental:</strong> Modelos de ML são otimizadores, não raciocinam. Hallucinations em LLMs e viés sistêmico em reconhecimento facial são riscos inerentes.',
+    },
+    warning:{
+      simple:'<strong>Cuidado!</strong> O TikTok/Instagram sempre te mostra o mesmo tipo de conteúdo — você está numa bolha! Tenta ver coisas diferentes.',
+      normal:'<strong>Reflexão:</strong> Quando um algoritmo decide o que você vê, ele molda sua visão de mundo. Varie suas fontes.',
+      deep:'<strong>Alinhamento:</strong> O Facebook Emotional Contagion Experiment (2014) demonstrou manipulação emocional em escala. Otimização por engajamento sistematicamente favorece conteúdo polarizador.',
+    },
+  },
+  a2:{icon:'🎬',
+    title:{simple:'Deepfakes: Quando Fotos e Vídeos Mentem!',normal:'Deepfakes: Quando Ver Não É Crer',deep:'Deepfakes: Fundamentos Técnicos, Vetores de Ataque e Contra-medidas'},
+    body:{
+      simple:'<p>Um "deepfake" é um vídeo FALSO feito por computador que parece real!</p><p><strong>Como perceber:</strong><br>👁️ Olhos piscam de jeito estranho<br>✂️ Bordas do rosto borradas<br>😐 Expressão não combina com o que fala</p>',
+      normal:'<p>Deepfakes são conteúdos (fotos, vídeos, áudios) gerados por IA para fazer parecer que alguém disse ou fez algo que nunca aconteceu.</p><ul><li>Piscar de olhos artificial</li><li>Bordas do rosto borradas ou inconsistentes</li><li>Expressões que não combinam com o tom de voz</li><li>Fundo inconsistente ao mover a cabeça</li></ul>',
+      deep:'<p>Deepfakes baseiam-se em GANs ou modelos de difusão. Uma rede geradora produz conteúdo sintético enquanto uma rede discriminadora classifica real/falso — o processo iterativo converge para síntese indistinguível.</p><ul><li><strong>Fraude executiva:</strong> Áudio/vídeo sintético para autorizar transferências (US$25M, Hong Kong, 2024)</li><li><strong>Desinformação política:</strong> Discursos fabricados em períodos eleitorais</li><li><strong>Phishing personalizado:</strong> Clonagem de voz de familiares para golpes de sequestro virtual</li></ul>',
+    },
+    tip:{
+      simple:'<strong>Dica:</strong> Sempre que ver um vídeo impressionante, pesquisa no Google se é verdade antes de compartilhar!',
+      normal:'<strong>Ferramenta:</strong> Busca reversa de imagens (Google Images) e FotoForensics ajudam a verificar.',
+      deep:'<strong>Ferramentas de detecção:</strong> Microsoft Video Authenticator, Intel FakeCatcher (análise de fluxo sanguíneo por rPPG). Limitação: corrida armamentista com detectores e geradores evoluindo juntos.',
+    },
+    warning:{
+      simple:'<strong>Regra:</strong> Nunca compartilhe vídeos chocantes de famosos sem verificar primeiro!',
+      normal:'<strong>Alerta:</strong> Deepfakes estão cada vez mais convincentes. O melhor antídoto é ceticismo saudável.',
+      deep:'<strong>Implicação jurídica:</strong> LGPD (Lei 13.709/2018) e Marco Civil (Lei 12.965/2014) oferecem base de responsabilização. Responsabilidade penal pode incluir Art. 139 CP (difamação) e Art. 313-A CP.',
+    },
+  },
+};
+
+// ----------------------------------------------------------------
+// QUIZ POOLS — multiple variants per age/topic
+// ----------------------------------------------------------------
+const QUIZZES={
+  s2:{
+    simple:[
+      {q:'O que significa verificação em duas etapas?',opts:['Usar duas senhas','Confirmar o login de dois jeitos diferentes','Ter duas contas','Trocar a senha duas vezes'],c:1,
+       exp:{simple:'É como ter dois cadeados na porta! Mesmo que alguém descubra sua senha, ainda precisa do código que chega no SEU celular!',normal:'O 2FA exige 2 confirmações: senha + algo só seu (SMS, app, biometria). Dificulta muito o acesso de invasores.',deep:'MFA implementa múltiplos fatores: algo que você sabe, tem ou é. Mitiga credential stuffing e phishing.'}},
+      {q:'Qual forma de confirmar login é mais segura?',opts:['Código por SMS','Pergunta secreta','App no celular (Google Auth)','Email'],c:2,
+       exp:{simple:'App autenticador: os códigos ficam só no SEU celular. Ninguém pode pegar remotamente!',normal:'Apps geram códigos temporários no dispositivo — não dependem de operadoras, mais seguros que SMS.',deep:'TOTP (RFC 6238) é imune a SIM swapping e ataques SS7 que comprometem SMS-OTP.'}},
+    ],
+    normal:[
+      {q:'O que é verificação em duas etapas (2FA)?',opts:['Senha com 2 letras','Confirmação por 2 métodos diferentes','Ter 2 contas','Responder 2 perguntas'],c:1,
+       exp:{simple:'Dois bloqueios de segurança!',normal:'O 2FA exige senha + algo só seu. Dificulta acesso de invasores.',deep:'MFA mitiga credential stuffing, phishing e reutilização de senha.'}},
+      {q:'Qual método 2FA é MAIS seguro?',opts:['SMS','Email','App autenticador','Pergunta secreta'],c:2,
+       exp:{simple:'App no celular — código fica só com você.',normal:'Apps autenticadores geram códigos temporários no dispositivo — mais seguros que SMS.',deep:'TOTP é imune a SIM swapping e SS7.'}},
+      {q:'Alguém tem sua senha. O 2FA ainda protege?',opts:['Não, senha basta','Sim, precisam do 2º fator','Depende','Só se senha for fraca'],c:1,
+       exp:{simple:'Sim! Dois bloqueios, duas barreiras.',normal:'O 2FA é uma camada extra — invasor precisaria do segundo fator.',deep:'Defense in depth: comprometer uma camada não equivale a comprometer o sistema.'}},
+    ],
+    deep:[
+      {q:'Qual vulnerabilidade o SMS-OTP não mitiga?',opts:['Brute force de senha','SIM swapping e ataques SS7','Phishing de interface','Credential stuffing'],c:1,
+       exp:{simple:'SMS pode ser interceptado.',normal:'SIM swapping clona seu número — 2FA por SMS fica exposto.',deep:'Ataques SS7 exploram vulnerabilidades no protocolo de telecomunicações global para interceptar SMS. TOTP hardware keys (FIDO2) são superiores.'}},
+      {q:'FIDO2/WebAuthn vantagem principal sobre TOTP:',opts:['Códigos mais longos','Resistência a phishing por vinculação ao domínio','Maior compatibilidade','Menor custo'],c:1,
+       exp:{simple:'WebAuthn cria chave única para cada site.',normal:'WebAuthn vincula a chave ao domínio — phishing em site falso não funciona.',deep:'WebAuthn usa criptografia de chave pública com challenge-response vinculado à origin. Impede phishing proxy (adversary-in-the-middle).'}},
+    ],
+  },
+  s4:{
+    simple:[
+      {q:'Qual dado NUNCA colocar na internet?',opts:['Cor favorita','Número do CPF','Nome do animal de estimação','Filme favorito'],c:1,
+       exp:{simple:'CPF é sua identidade digital! Se alguém pegar, pode abrir dívidas no seu nome!',normal:'CPF, RG, senha, cartão — dados sensíveis nunca devem ser compartilhados online.',deep:'PII como CPF são vetores primários de fraude de identidade e lavagem de dados.'}},
+      {q:'App pede câmera o tempo todo. Você:',opts:['Aceita — pode precisar','Aceita só quando usar o app','Desinstala','Ignora'],c:1,
+       exp:{simple:'Aceita só quando usa — você não deixa a câmera ligada o dia todo, né?',normal:'"Somente ao usar" é mais seguro — o app não precisa rastrear 24h.',deep:'Princípio do menor privilégio: conceder apenas permissões estritamente necessárias.'}},
+    ],
+    normal:[
+      {q:'Qual dado NÃO compartilhar em redes?',opts:['Hobby favorito','Número do CPF','Cidade onde mora','Filme preferido'],c:1,
+       exp:{simple:'CPF nunca!',normal:'CPF, RG, senha, cartão — dados sensíveis fora das redes.',deep:'PII sensíveis sujeitos a LGPD Art. 11.'}},
+      {q:'App pede localização "sempre ativa":',opts:['Sempre permitir','Somente ao usar','Nunca usar','Ignorar'],c:1,
+       exp:{simple:'Somente ao usar — sem rastreamento 24h.',normal:'"Somente ao usar" é mais seguro.',deep:'Least privilege: minimizar exposição de dados desnecessários.'}},
+      {q:'Seus dados foram vazados. Primeira ação:',opts:['Postar nas redes','Trocar senhas imediatamente','Esperar aviso','Formatar celular'],c:1,
+       exp:{simple:'Troca as senhas logo!',normal:'Troque senhas imediatamente e ative o 2FA.',deep:'Incident response: contenção imediata, notificação de serviços críticos.'}},
+    ],
+    deep:[
+      {q:'Base legal mais invocada por redes sociais sob LGPD:',opts:['Cumprimento de obrigação legal','Legítimo interesse','Consentimento','Execução de contrato'],c:2,
+       exp:{simple:'Consentimento — você aceita os termos.',normal:'Consentimento do usuário via termos de uso.',deep:'O consentimento (Art. 7º, I) é questionável quando via termos extensos de adesão. O "legítimo interesse" (Art. 7º, IX) é crescentemente usado como alternativa.'}},
+    ],
+  },
+  s5:{
+    simple:[
+      {q:'"Parabéns! Você ganhou um iPhone! Clique aqui!" Você:',opts:['Clica rápido!','Manda pra família','Ignora — é um golpe!','Responde pedindo mais'],c:2,
+       exp:{simple:'Golpe clássico! Ninguém sorteia iPhone por mensagem. Se parece bom demais, é armadilha!',normal:'Phishing clássico. Nunca clique em links de prêmios inesperados.',deep:'Phishing de "prêmio" usa urgência e recompensa para explorar System 1 thinking.'}},
+      {q:'Senha boa precisa ter:',opts:['Só seu nome','Pelo menos 8 letras, números e símbolo','Só números','Sua data de nascimento'],c:1,
+       exp:{simple:'Mistura de letras, números e símbolos — difícil de adivinhar!',normal:'12+ caracteres misturados.',deep:'Entropia mínima de 60+ bits.'}},
+    ],
+    normal:[
+      {q:'"Parabéns! Ganhou R$1.000! Clique aqui." O que fazer?',opts:['Clicar','Compartilhar','Ignorar/denunciar — é phishing','Responder'],c:2,
+       exp:{simple:'Phishing — nunca clique!',normal:'Mensagens de prêmios inesperados são phishing clássico.',deep:'Social engineering via urgency e reward triggers.'}},
+      {q:'Senha segura deve ter:',opts:['Nome e data','Só maiúsculas','12+ caracteres com letras, números e símbolos','Fácil de lembrar'],c:2,
+       exp:{simple:'12+ caracteres misturados.',normal:'Senhas fortes têm 12+ caracteres com variedade.',deep:'Entropia de 60+ bits.'}},
+      {q:'Link suspeito de amigo no WhatsApp. Como verificar?',opts:['Clicar para ver','Ligar para o amigo perguntando','Encaminhar para outros','Confiar no amigo'],c:1,
+       exp:{simple:'Liga pro amigo! A conta pode ter sido hackeada.',normal:'Contas podem ser clonadas. Confirme por ligação antes de clicar.',deep:'Account hijacking como vetor de distribuição. Verificação out-of-band.'}},
+    ],
+    deep:[
+      {q:'Qual técnica de phishing LLM-enhanced mais difícil de detectar?',opts:['Mass phishing genérico','Spear phishing personalizado via IA','Smishing','Vishing'],c:1,
+       exp:{simple:'IA cria mensagens muito personalizadas.',normal:'LLMs permitem phishing personalizado em escala.',deep:'Spear phishing enriquecido com LLM usa OSINT para personalização com custo marginal próximo de zero.'}},
+    ],
+  },
+  f2:{
+    simple:[
+      {q:'Como saber se uma notícia é verdadeira?',opts:['Acredita se parecer real','Vê quantas curtidas tem','Procura em sites de jornal de verdade','Manda pra família decidir'],c:2,
+       exp:{simple:'Busca no Google e vê se aparece no G1, Folha, UOL... Se não aparecer, suspeita!',normal:'Sempre busque em fontes jornalísticas reconhecidas.',deep:'Triangulação de fontes primárias e verificação de provenance.'}},
+      {q:'O que é busca reversa de imagem?',opts:['Deletar uma imagem','Descobrir onde a foto apareceu antes na internet','Deixar a foto de cabeça pra baixo','Editar'],c:1,
+       exp:{simple:'Você usa o Google para procurar a foto no mundo inteiro. Descobre se é foto velha com legenda errada!',normal:'Mostra onde a foto apareceu antes. Muitas "fotos recentes" são imagens antigas reaproveitadas.',deep:'Reverse image search revela provenance — origem, data original e contextos anteriores.'}},
+    ],
+    normal:[
+      {q:'Primeiro passo para verificar notícia suspeita?',opts:['Compartilhar para opiniões','Buscar em veículos jornalísticos','Acreditar se vier de amigo','Comentar que é fake'],c:1,
+       exp:{simple:'Busca em jornais conhecidos.',normal:'Busque em fontes jornalísticas reconhecidas antes de acreditar.',deep:'Triangulação de fontes e verificação de provenance.'}},
+      {q:'Imagem impactante. Como verificar?',opts:['Acreditar porque parece real','Busca reversa de imagem','Compartilhar pedindo opinião','Ver curtidas'],c:1,
+       exp:{simple:'Busca reversa mostra de onde a foto veio.',normal:'Busca reversa mostra onde a foto apareceu antes.',deep:'Verificação de provenance e data de origem.'}},
+      {q:'Agências de fact-checking no Brasil:',opts:['Facebook e Instagram','Agência Lupa, AosFatos e Boatos.org','Reddit e Twitter','WhatsApp'],c:1,
+       exp:{simple:'Agência Lupa, AosFatos, Boatos.org — os detetives de notícias do Brasil!',normal:'Agência Lupa, AosFatos e Boatos.org são referências de checagem.',deep:'Fact-checkers signatários do IFCN seguem código de transparência e metodologia aberta.'}},
+    ],
+    deep:[
+      {q:'O modelo SIFT de verificação significa:',opts:['See, Identify, Follow, Trust','Stop, Investigate, Find better coverage, Trace claims','Search, Index, Filter, Tag','Sort, Integrate, Fix, Test'],c:1,
+       exp:{simple:'Para, investiga a fonte, busca cobertura melhor.',normal:'SIFT: pare, investigue a fonte, busque melhor cobertura, rastreie afirmações.',deep:'SIFT (Caulfield, 2019) é framework que prioriza verificação de fonte antes do consumo de conteúdo.'}},
+    ],
+  },
+  f4:{
+    simple:[
+      {q:'"Vitamina C CURA o câncer 100%!" Você:',opts:['Manda pro grupo familiar','Acredita — parece científico','Pesquisa em sites de médicos antes','Compartilha com aviso'],c:2,
+       exp:{simple:'Pesquisa no INCA ou Ministério da Saúde. Notícias de cura milagrosa quase sempre são falsas!',normal:'Afirmações de "curas milagrosas" são desinformação clássica em saúde.',deep:'Health misinformation tem impacto em vaccine hesitancy e abandono de tratamentos eficazes.'}},
+    ],
+    normal:[
+      {q:'"Vitamina C CURA câncer em 100% dos casos." Você:',opts:['Compartilha','Pesquisa em fontes médicas antes','Manda no grupo','Ignora'],c:1,
+       exp:{simple:'Pesquisa no INCA antes.',normal:'Afirmações milagrosas = desinformação de saúde. Consulte INCA, Fiocruz.',deep:'Health misinformation com implicações de saúde pública documentadas.'}},
+      {q:'Fake news se espalhando. Ação mais responsável:',opts:['Compartilhar com aviso','Ignorar','Denunciar + compartilhar o fato correto','Brigar com quem compartilhou'],c:2,
+       exp:{simple:'Denuncia E compartilha a verdade!',normal:'Denuncie E compartilhe a versão verificada.',deep:'Prebunking e inoculation theory (Cook et al., 2017).'}},
+    ],
+    deep:[
+      {q:'Por que fake news se espalha mais rápido que informação verdadeira?',opts:['Algoritmos favorecem conteúdo falso','Conteúdo falso gera mais emoção e engajamento','Pessoas preferem mentiras','Jornalistas são mais lentos'],c:1,
+       exp:{simple:'Notícias falsas são mais emocionantes — raiva e medo fazem compartilhar mais.',normal:'Conteúdo emocional gera mais engajamento — algoritmos amplificam.',deep:'Vosoughi, Roy & Aral (Science, 2018): fake news se espalha 6x mais rápido. Novidade e resposta emocional (indignação e medo) são preditores principais.'}},
+    ],
+  },
+  r2:{
+    simple:[
+      {q:'Como é um perfil falso nas redes?',opts:['Muitas fotos com amigos reais','Poucas fotos genéricas, conta nova, sem amigos em comum','Muitos seguidores famosos','Posta há anos'],c:1,
+       exp:{simple:'Poucas fotos de modelos, conta recente e sem ninguém em comum = suspeito!',normal:'Perfis falsos têm poucas fotos genéricas, foram criados recentemente e têm poucos amigos em comum.',deep:'Sockpuppets: baixa antiguidade, ausência de rede orgânica, imagens de stock.'}},
+      {q:'Pessoa bonita que você nunca viu te manda mensagem. Você:',opts:['Aceita logo!','Verifica o perfil e a foto primeiro','Bloqueia sem falar','Manda pra amigos'],c:1,
+       exp:{simple:'Verifica o perfil! Pesquisa a foto no Google — pode ser de modelo ou ator!',normal:'Sempre verifique! Faça busca reversa da foto.',deep:'Romance scam: perfil sintético para criar vínculo emocional antes de extração.'}},
+    ],
+    normal:[
+      {q:'Sinais de perfil falso:',opts:['Muitas fotos pessoais','Poucas fotos genéricas, criado recentemente, sem amigos em comum','Muitos seguidores','Posta há anos'],c:1,
+       exp:{simple:'Poucos amigos, fotos genéricas, conta nova.',normal:'Perfis falsos têm poucas fotos genéricas, foram recentemente criados.',deep:'Indicadores: criação recente, ausência de rede orgânica, imagens de banco de fotos.'}},
+      {q:'Para privacidade, o melhor é:',opts:['Perfil público','Aceitar todos','Perfil privado e aceitar só quem conhece','Nunca postar'],c:2,
+       exp:{simple:'Perfil privado + só conhecidos = mais segurança.',normal:'Perfil privado + aceitar apenas pessoas que você conhece.',deep:'Minimização da superfície de exposição e coleta de dados por terceiros.'}},
+    ],
+    deep:[
+      {q:'Técnica principal dos romance scams:',opts:['Intimidação','Love bombing e construção de dependência emocional','Impersonação de autoridade','Phishing técnico'],c:1,
+       exp:{simple:'Love bombing: atenção excessiva para criar dependência.',normal:'Love bombing: atenção intensa para criar dependência, depois solicitação de dinheiro.',deep:'Love bombing é manipulação por reforço afetivo intenso para criar dependência e reduzir pensamento crítico. Seguido de grooming gradual e extração financeira ou informacional.'}},
+    ],
+  },
+  r5:{
+    simple:[
+      {q:'Alguém comentou onde você mora numa foto sua. O que fazer?',opts:['Curte','Apaga e verifica as fotos','Posta mais fotos da casa','Ignora'],c:1,
+       exp:{simple:'Apaga rápido! E nunca mostre fachada da casa, escola ou uniforme nas fotos.',normal:'Apague, revise configurações e bloqueie.',deep:'Geolocation OSINT: postagens fragmentadas permitem triangulação de localização.'}},
+    ],
+    normal:[
+      {q:'Foto postada e estranho comentou seu endereço. Você:',opts:['Curte','Apaga, revisa configurações, bloqueia','Posta mais fotos','Ignora'],c:1,
+       exp:{simple:'Apaga + bloqueio imediato.',normal:'Apague, revise configurações e bloqueie.',deep:'Geolocation exposure e doxing mitigation.'}},
+      {q:'O que é grooming online?',opts:['Jogo online','Adulto que ganha confiança de criança para abusar','Filtro de foto','Edição de vídeo'],c:1,
+       exp:{simple:'Adulto se aproximando de criança na internet com má intenção. Conte para um adulto de confiança!',normal:'Grooming: adultos se aproximam de crianças online com intenções de abuso.',deep:'Processo gradual de coerção e isolamento. Crime previsto no ECA (Art. 241-D).'}},
+    ],
+    deep:[
+      {q:'Aspecto de OPSEC digital mais negligenciado em redes sociais:',opts:['Senha fraca','Metadados EXIF e geolocalização implícita por contexto visual','Perfil público','Ausência de 2FA'],c:1,
+       exp:{simple:'Metadados e pistas visuais nas fotos revelam muito mais.',normal:'Metadados EXIF e contexto visual revelam localização e rotinas.',deep:'EXIF incorporam GPS, timestamp, modelo de dispositivo. Contexto visual permite geolocalização via OSINT. Mitigação: stripagem de metadados antes do upload.'}},
+    ],
+  },
+  a4:{
+    simple:[
+      {q:'O que é um deepfake?',opts:['Filtro divertido','Vídeo ou foto FALSO feito por computador','Vírus','Rede social'],c:1,
+       exp:{simple:'Como uma fantasia digital realista! O computador aprende como alguém parece e cria vídeo falso.',normal:'Deepfakes usam IA para criar conteúdos falsos hiper-realistas.',deep:'GANs e modelos de difusão permitem síntese de conteúdo indistinguível.'}},
+      {q:'Como suspeitar de deepfake?',opts:['Qualidade alta','Olhos piscando estranhamente e bordas borradas','Duração longa','Muitas views'],c:1,
+       exp:{simple:'Olhos que piscam estranho, bordas borradas, boca fora de sincronia — suspeite!',normal:'Deepfakes têm imperfeições: piscar anormal, bordas do rosto, expressões inconsistentes.',deep:'Artefatos: flickering de bordas, temporal inconsistency em eye blink, assincronia audiovisual.'}},
+    ],
+    normal:[
+      {q:'Deepfake é:',opts:['Filtro divertido','Conteúdo criado por IA para parecer real','Vírus','Rede social'],c:1,
+       exp:{simple:'Conteúdo sintético — parece real mas é fabricado.',normal:'Deepfakes usam IA para criar conteúdos falsos hiper-realistas.',deep:'Síntese por GAN/diffusion model.'}},
+      {q:'Vídeo chocante de político. Antes de compartilhar:',opts:['Compartilhar rápido','Verificar em múltiplas fontes','Perguntar no WhatsApp','Acreditar'],c:1,
+       exp:{simple:'SEMPRE verifica antes!',normal:'Deepfakes de figuras públicas são crescentes. Verifique em múltiplas fontes.',deep:'Verificação multifonte e análise forense antes de amplificação.'}},
+    ],
+    deep:[
+      {q:'Tecnologia que torna deepfakes mais convincentes em 2024:',opts:['CNNs de 2015','Modelos de difusão (Stable Diffusion, DALL-E)','Filtros de Instagram','Compressão JPEG'],c:1,
+       exp:{simple:'Modelos de difusão geram imagens extremamente realistas.',normal:'Modelos de difusão produzem conteúdo crescentemente indistinguível do real.',deep:'Diffusion models superam GANs em qualidade e controle. LoRA permite fine-tuning eficiente em poucas imagens. Pipeline de síntese face-swap evoluiu para identity-preserving synthesis com temporal consistency.'}},
+    ],
+  },
+  a5:{
+    simple:[
+      {q:'Uso positivo da IA:',opts:['Só deepfakes','Ajudar médicos a encontrar doenças mais rápido','Só jogos','Roubar senhas'],c:1,
+       exp:{simple:'A IA ajuda médicos, pesquisadores e professores! O problema é o uso irresponsável.',normal:'A IA tem inúmeras aplicações positivas.',deep:'Diagnóstico médico (FDA-cleared devices), previsão climática, acessibilidade.'}},
+      {q:'Site usa IA para "personalizar experiência". Na prática:',opts:['Deixa o site colorido','Olha o que você faz para mostrar coisas e anúncios','Torna mais rápido','Garante que tudo é verdadeiro'],c:1,
+       exp:{simple:'Analisa tudo que você clica para te mostrar mais do mesmo — e anúncios!',normal:'Algoritmos analisam comportamento para maximizar tempo no site.',deep:'Sistemas de recomendação otimizam proxy metrics de engajamento — não bem-estar do usuário.'}},
+    ],
+    normal:[
+      {q:'IA pode ser usada positivamente para:',opts:['Apenas deepfakes','Diagnóstico médico, acessibilidade, tradução, educação','Só jogos','Só fábricas'],c:1,
+       exp:{simple:'Muitas aplicações positivas.',normal:'IA tem inúmeras aplicações. O importante é usar com consciência.',deep:'Benefícios em saúde, acessibilidade, ciência.'}},
+      {q:'Site usa IA para "personalizar". Na prática:',opts:['Só marketing','Analisa dados para conteúdo e anúncios','Melhora visual','Garante veracidade'],c:1,
+       exp:{simple:'Analisa seu comportamento para maximizar engajamento.',normal:'Algoritmos analisam comportamento para maximizar tempo no site.',deep:'Otimização de proxy metrics.'}},
+    ],
+    deep:[
+      {q:'Principal risco do AI alignment para usuários comuns:',opts:['IA lenta','Sistemas otimizando por métricas proxy que divergem do bem-estar real','Custo de computação','Consumo de bateria'],c:1,
+       exp:{simple:'IA pode maximizar engajamento ao invés de seu bem-estar real.',normal:'Sistemas otimizando engajamento ao invés de bem-estar genuíno.',deep:'O problema de alinhamento (Braghieri et al., AER, 2022): função objetivo de engajamento é proxy imperfeito do bem-estar — resultando em amplificação de conteúdo polarizador.'}},
+    ],
+  },
+};
+
+// Simulation pools — multiple scenarios per module for variation
+const SIMS={
+  s3:[
+    {title:'Mensagem Suspeita',from:'Banco Seguro 🏦',isScam:true,
+     msgs:[{t:'them',m:'Olá! Detectamos atividade suspeita na sua conta. Verifique agora para evitar bloqueio.'},{t:'them',m:'<span class="sim-link">⚠️ banco-seguro-urgente.xyz/verificar</span> — Prazo: 24h'}],
+     exp:{simple:'Golpe! Banco NUNCA manda link no WhatsApp. O endereço "banco-seguro-urgente.xyz" é suspeito. Ligue para o banco usando o número no cartão.',normal:'Phishing clássico! Bancos nunca pedem verificação por link no WhatsApp. Domínio suspeito. Acesse apenas pelo app oficial.',deep:'Phishing com urgency trigger e spoofing de autoridade. Domain cybersquatting para simular legitimidade. HTTPS não garante autenticidade (90%+ dos sites phishing têm SSL). Verificação out-of-band pelo canal oficial.'}},
+    {title:'Prêmio Inesperado',from:'Promoção Exclusiva 🎁',isScam:true,
+     msgs:[{t:'them',m:'Parabéns! Você foi sorteado para receber R$2.000! Clique para resgatar agora!'},{t:'them',m:'<span class="sim-link">⏰ resgate-especial.xyz/premio</span> — Expira em 2h!'}],
+     exp:{simple:'Golpe do prêmio! Ninguém te dá dinheiro de graça por mensagem. A pressa ("expira em 2h") é pra você não pensar!',normal:'Scam clássico de "prêmio". Urgência artificial para evitar reflexão. Links encurtados ou domínios suspeitos = red flag.',deep:'Advance fee fraud variant. Urgency e scarcity exploram System 1 (Kahneman). URL não-oficial confirma o vetor de ataque. Never click — verifique out-of-band.'}},
+  ],
+  f3:[
+    {title:'Vai Compartilhar?',from:'Grupo Família 👨‍👩‍👧',isScam:true,
+     msgs:[{t:'them',m:'🚨 URGENTE! Cientistas provam que vacina causa autismo! Compartilhe antes que censurem! 😱'},{t:'them',m:'Já tem 2 milhões de compartilhamentos!'}],
+     exp:{simple:'Mentira! Cientistas já provaram que vacinas NÃO causam autismo. "Censurem!" e "compartilhe urgente" são sinais de notícia falsa!',normal:'Desinformação de saúde! Não há evidência científica. Linguagem alarmista e "2M compartilhamentos" são red flags. Cheque em Agência Lupa.',deep:'Vaccine misinformation rastreável ao estudo Wakefield (1998), retratado pela Lancet em 2010. Conspiracy rhetoric + fabricação de métricas. Impacto: surtos de sarampo documentados em populações com vaccine hesitancy.'}},
+    {title:'Notícia Viral',from:'Amigo no Zap 💬',isScam:true,
+     msgs:[{t:'them',m:'Cara, você viu isso? Dizem que o governo vai taxar o PIX em 50%!! Todo mundo tá desesperado'},{t:'them',m:'Vi em vários grupos, deve ser verdade né?'}],
+     exp:{simple:'"Vi em vários grupos" não significa que é verdade! Pesquisa no G1 ou Folha para confirmar.',normal:'Rumor amplificado sem fonte. "Vi em vários grupos" não é verificação. Consulte Agência Lupa ou o site oficial do Banco Central.',deep:'Exemplo de rumor financeiro com viral spread. "Vi em vários grupos" exemplifica o fenômeno do disponibilidade heurística (Tversky & Kahneman). Fonte primária: bcb.gov.br. Fact-check: Agência Lupa.'}},
+  ],
+  r3:[
+    {title:'Pedido Suspeito',from:'@lindinha_2024 💕',isScam:true,
+     msgs:[{t:'them',m:'Oi! Vi seu perfil e adorei! Sou modelo, vou pra sua cidade semana que vem...'},{t:'them',m:'Pode me ajudar? Preciso de R$200 via PIX pra minha passagem. Te devolvo, juro! 💕'}],
+     exp:{simple:'Golpe do amor! Essa pessoa que você nunca viu está pedindo dinheiro. NUNCA mande dinheiro para desconhecidos da internet!',normal:'Romance scam! Desconhecido + intimidade rápida + pedido de dinheiro urgente = golpe. Nunca envie dinheiro para desconhecidos.',deep:'Romance scam: perfil sintético com atração física (verificável via reverse image search), rapport rápido, solicitação de valor via PIX (sem estorno). Volume cresceu 180% pós-PIX (Febraban, 2022).'}},
+  ],
+  a3:[
+    {title:'Conteúdo Viral Suspeito',from:'Canal de Notícias 📢',isScam:true,
+     msgs:[{t:'them',m:'🔥 Vídeo BOMBÁSTICO: Presidente anuncia mudanças radicais em discurso secreto!'},{t:'them',m:'ESTÁ SENDO DELETADO! Salve agora! O rosto pisca de forma estranha — veja bem!'}],
+     exp:{simple:'"Está sendo deletado" = mentira para compartilhar rápido. Rosto piscando estranho = pode ser deepfake! Pesquisa em sites de jornal primeiro.',normal:'Deepfake provável! "Sendo deletado" + expressões artificiais = red flags. Verifique em portais jornalísticos antes de qualquer ação.',deep:'Multiple red flags: urgency trigger, conspiracy framing, deepfake indicators. Mecanismo de "urgência de deletação" explora FOMO para induzir compartilhamento impulsivo (System 1 bypass).'}},
+  ],
+};
+
+const ACHIEVEMENTS=[
+  {id:'first',icon:'⭐',name:'Primeira Lição'},{id:'speed',icon:'⚡',name:'Raio Verde'},
+  {id:'security',icon:'🛡️',name:'Guardião'},{id:'fakenews',icon:'🔍',name:'Detetive'},
+  {id:'social',icon:'📱',name:'Conectado'},{id:'ai',icon:'🤖',name:'Futurista'},
+  {id:'all',icon:'🏆',name:'NetSafe Master'},{id:'streak3',icon:'🔥',name:'Em Chamas'},
+  {id:'xp500',icon:'💎',name:'Diamante'},{id:'perfect',icon:'🎯',name:'Quiz Perfeito'},
+  {id:'analyst',icon:'🧠',name:'Analista'},
+];
+
+const LEARNING_STYLES={
+  explorer:{icon:'🎯',name:'Explorador',desc:'Gosta de desafios e conteúdo direto'},
+  reflective:{icon:'🔍',name:'Reflexivo',desc:'Prefere entender bem antes de avançar'},
+  competitive:{icon:'🏆',name:'Competitivo',desc:'Se motiva por pontuação e ranking'},
+  systematic:{icon:'📋',name:'Sistemático',desc:'Prefere completar tudo em ordem'},
+};
+
+const EVENTS=[
+  {title:'Semana Anti-Phishing',sub:'Missões extras com XP em dobro!',bg:'linear-gradient(135deg,#D45050,#E8B84B)'},
+  {title:'Desafio Fake News',sub:'Quiz especial de verificação de fontes',bg:'linear-gradient(135deg,#5B9BD5,#9B7FD4)'},
+  {title:'Semana da Privacidade',sub:'Conteúdo exclusivo sobre LGPD e dados',bg:'linear-gradient(135deg,#7BBFB5,#6BAF7A)'},
+];
+
+const FEED_TIPS={
+  '8-11':[
+    {icon:'🔑',text:'<strong>Senha secreta:</strong> Não conta pra ninguém, nem pro melhor amigo!',tag:'Segurança'},
+    {icon:'🚨',text:'<strong>Adulto pedindo foto?</strong> Fala pra seus pais imediatamente!',tag:'Proteção'},
+    {icon:'📰',text:'<strong>Notícia impressionante?</strong> Pede ajuda a um adulto pra verificar.',tag:'Fake News'},
+    {icon:'📍',text:'<strong>Não diz onde você está</strong> em tempo real nas redes!',tag:'Privacidade'},
+  ],
+  '12-14':[
+    {icon:'🔑',text:'<strong>Senhas diferentes</strong> pra cada app — usa um gerenciador!',tag:'Segurança'},
+    {icon:'🎣',text:'<strong>Link estranho?</strong> Confirma por ligação antes de clicar.',tag:'Golpes'},
+    {icon:'📰',text:'<strong>Notícia bombástica?</strong> Pesquisa antes de compartilhar.',tag:'Fake News'},
+    {icon:'📱',text:'<strong>Revisa as configs de privacidade</strong> todo mês.',tag:'Privacidade'},
+  ],
+  '15-17':[
+    {icon:'🔐',text:'<strong>Ativa o 2FA</strong> em todas as contas importantes agora.',tag:'Segurança'},
+    {icon:'🎣',text:'<strong>Urgência artificial</strong> em mensagens = sinal clássico de golpe.',tag:'Phishing'},
+    {icon:'🔍',text:'<strong>Antes de compartilhar:</strong> verifique a fonte + busque em outros veículos.',tag:'Fake News'},
+    {icon:'🤖',text:'<strong>O feed te mostra o que te mantém no app,</strong> não o que é mais verdadeiro.',tag:'Algoritmos'},
+  ],
+  '18-21':[
+    {icon:'🔐',text:'<strong>FIDO2/hardware key</strong> para contas críticas — imune a phishing.',tag:'Segurança'},
+    {icon:'🧠',text:'<strong>Lateral reading:</strong> abra abas sobre a fonte, não só sobre o conteúdo.',tag:'Fact-checking'},
+    {icon:'⚖️',text:'<strong>LGPD Art. 18:</strong> você tem direito à exclusão dos seus dados pessoais.',tag:'Direitos'},
+    {icon:'🤖',text:'<strong>Engajamento ≠ bem-estar.</strong> Audite seu consumo digital periodicamente.',tag:'IA'},
+  ],
+};
+
+// AI Hints database — age-adapted
+const HINTS={
+  quiz_wrong:{
+    '8-11':['Não desiste! Relê a explicação com calma 😊','Você quase foi! Pensa de novo...','Todo detetive aprende com os erros! 🌱'],
+    '12-14':['Não foi dessa vez. Mas a explicação é boa — relê!','Ops! Confere a dica abaixo 👇','Errou, mas aprendeu — isso é o que importa!'],
+    '15-17':['Resposta incorreta. A explicação abaixo clarifica.','Não é essa. Vale revisar o conceito.','Errou — a explicação tem o raciocínio correto.'],
+    '18-21':['Incorreto. Analise a justificativa — há nuances.','Não. O argumento correto está na explicação.','Resposta incorreta. A explicação contextualiza aspectos críticos.'],
+  },
+  pattern_security:{
+    '8-11':['🎣 Você errou perguntas sobre golpes! Lembra: golpistas usam PRESSA e MEDO pra você agir sem pensar!'],
+    '12-14':['Dificuldade com phishing detectada. Dica: golpes quase sempre usam urgência artificial. "Responda agora!" = alerta.'],
+    '15-17':['Padrão de erro em phishing/social engineering. Revise os gatilhos: urgência, autoridade, medo, recompensa.'],
+    '18-21':['Padrão: phishing. Recomendo revisar os princípios de Cialdini e o modelo MITRE ATT&CK (Initial Access).'],
+  },
+  pattern_fakenews:{
+    '8-11':['📰 Você teve dúvidas sobre notícias falsas! Se a notícia deixou você com raiva ou super animado, PARA e verifica!'],
+    '12-14':['Dificuldade em identificar fake news. Pesquisa no Google a notícia + "é fake" — simples e eficaz!'],
+    '15-17':['Padrão: dificuldade em fact-checking. Experimente o método SIFT: Stop, Investigate, Find, Trace.'],
+    '18-21':['Padrão em verificação. Recomendo o SIFT method (Caulfield) e lateral reading como prática sistemática.'],
+  },
+  first_lesson:{
+    '8-11':['🎉 Primeira lição concluída! Você já está ficando um expert em segurança digital! Continue explorando!'],
+    '12-14':['Primeira lição concluída! Agora o negócio esquenta — tenta o quiz do módulo!'],
+    '15-17':['Primeira lição concluída. Os próximos conteúdos ficam mais complexos — continue!'],
+    '18-21':['Módulo introdutório concluído. Os conteúdos subsequentes aprofundam as implicações práticas e legais.'],
+  },
+  before_quiz:{
+    '8-11':['💡 Dica: lê cada resposta com calma antes de escolher! Não precisa de pressa 😊'],
+    '12-14':['Dica rápida: desconfie das respostas que parecem "óbvias demais". Quiz é pra pensar!'],
+    '15-17':['Atenção: as alternativas testam compreensão conceitual, não memorização.'],
+    '18-21':['As questões testam aplicação contextual. Considere o cenário completo antes de responder.'],
+  },
+  deep_mode:{
+    '8-11':['✨ Modo especial ativado! Você vai ver explicações mais detalhadas!'],
+    '12-14':['Modo Aprofundado: explicações com mais contexto e detalhes técnicos!'],
+    '15-17':['Modo Aprofundado: conteúdo com referências e análise técnica mais detalhada.'],
+    '18-21':['Modo Aprofundado: incluindo referências acadêmicas, jurídicas e análise de threat model.'],
+  },
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let P=null;
+let obData={age:'8-11',name:'',avatar:'🦊',theme:'default'};
+let currentModule=null;
+let currentLesson=null;
+let quizState={};
+let explainMode='normal';
+let langLevel='auto';
+let screenHistory=[];
+let hintTimer=null;
+let lastHintType='';
+
+// ================================================================
+// PERSISTENCE
+// ================================================================
+function loadState(){
+  try{
+    const id=localStorage.getItem('ns2_active');
+    if(id){P=JSON.parse(localStorage.getItem('ns2_p_'+id));return P;}
+  }catch(e){}return null;
+}
+function saveState(){
+  if(!P)return;
+  try{localStorage.setItem('ns2_p_'+P.id,JSON.stringify(P));localStorage.setItem('ns2_active',P.id);}catch(e){}
+}
+function createProfile(name,avatar,age,theme,hints){
+  const id='p_'+Date.now();
+  P={id,name,avatar,age,theme,
+    xp:0,totalXp:0,daysStreak:1,lessonsCompleted:0,
+    completedLessons:{},completedModules:{},achievements:[],
+    errorPatterns:{},behaviorScore:{challenges:0,reads:0,deepModeUses:0},
+    langLevel:'auto',explainMode:'normal',
+    hintsEnabled:hints!==false,
+    createdAt:Date.now()};
+  saveState();
+}
+
+// ================================================================
+// LANGUAGE & ADAPTATION ENGINE
+// ================================================================
+function getLangKey(){
+  if(!P)return 'normal';
+  if(langLevel!=='auto')return langLevel;
+  return{
+    '8-11':'simple','12-14':'normal','15-17':'normal','18-21':'deep'
+  }[P.age]||'normal';
+}
+function getLp(){return LP[P?.age||'12-14'];}
+function getExplainKey(){
+  if(explainMode==='quick')return 'simple';
+  if(explainMode==='deep')return 'deep';
+  return getLangKey();
+}
+function inferStyle(){
+  if(!P)return 'explorer';
+  const b=P.behaviorScore||{};
+  const {challenges=0,reads=0}=b;
+  if(challenges>reads*1.5)return 'competitive';
+  if(reads>challenges*1.5)return 'reflective';
+  if((P.lessonsCompleted||0)>8)return 'systematic';
+  return 'explorer';
+}
+function detectTrail(){
+  if(!P)return{icon:'🛣️',name:'Trilha Iniciante',sub:'Comece pelos fundamentos'};
+  const ep=P.errorPatterns||{};
+  const done=P.lessonsCompleted||0;
+  if(done===0)return{icon:'🚀',name:'Trilha de Partida',sub:getLp().readyText.split('!')[0]+'!'};
+  if(ep.security>1)return{icon:'🎣',name:'Foco Anti-Phishing',sub:'Reforço nas lições de golpes e segurança'};
+  if(ep.fakenews>1)return{icon:'📰',name:'Foco Fake News',sub:'Prática extra em verificação de informação'};
+  if(done<5)return{icon:'🌱',name:'Trilha Fundamental',sub:'Fundamentos de segurança digital'};
+  if(done<12)return{icon:'🛡️',name:'Trilha Avançada',sub:'Conteúdos mais complexos disponíveis'};
+  return{icon:'🏆',name:'Trilha Mestre',sub:'Você está no nível máximo!'};
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function goScreen(id){
+  const cur=document.querySelector('.screen.active');
+  if(cur&&cur.id!==id)screenHistory.push(cur.id);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  window.scrollTo(0,0);
+  dismissHint();
+  if(id==='screen-app')renderApp();
+  if(id==='screen-profile')renderProfile();
+  if(id==='screen-ranking')renderRanking();
+}
+function leaveLesson(){
+  dismissHint();
+  goScreen('screen-module');
+  renderLessons();
+}
+function setNav(el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+}
+function openFirstModule(){
+  if(currentModule)goScreen('screen-module');
+  else openModule('security');
+}
+
+// ================================================================
+// ONBOARDING
+// ================================================================
+function selectAge(age,el){
+  obData.age=age;
+  document.querySelectorAll('.age-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectAvatar(av,el){
+  obData.avatar=av;
+  document.querySelectorAll('.avatar-item').forEach(a=>a.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectTheme(theme,el){
+  obData.theme=theme;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  applyTheme(theme);
+}
+function nextOb(step){
+  if(step===2){
+    const name=document.getElementById('ob-name').value.trim();
+    if(!name){showToast('⚠️ Digite seu nome!');return;}
+    obData.name=name;
+    const lp=LP[obData.age]||LP['12-14'];
+    document.getElementById('ob-preview-name').textContent=name;
+    document.getElementById('ob-final-av').textContent=obData.avatar;
+    document.getElementById('ob-final-name').textContent=name;
+    document.getElementById('ob-final-age').textContent=`${obData.age} anos`;
+    document.getElementById('ob-lang-badge').textContent=`Linguagem: ${lp.langBadge}`;
+    document.getElementById('ob-ready-text').textContent=lp.readyText;
+  }
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ob-'+step)?.classList.add('active');
+  for(let i=0;i<=3;i++){
+    document.getElementById('dot-'+i)?.classList.toggle('done',i<=step);
+  }
+}
+function finishOnboard(){
+  const hints=document.getElementById('tog-hints-ob')?.classList.contains('on');
+  createProfile(obData.name,obData.avatar,obData.age,obData.theme,hints);
+  langLevel='auto';
+  applyTheme(obData.theme);
+  goScreen('screen-app');
+  playSound('success');
+  const lp=getLp();
+  setTimeout(()=>{
+    showXPPopup(0,lp.greeting(P.name),'🎉','Bem-vindo ao NetSafe!\nSua jornada digital começa agora.',true);
+  },500);
+}
+function loadExistingProfile(){
+  const p=loadState();
+  if(p){P=p;langLevel=p.langLevel||'auto';explainMode=p.explainMode||'normal';applyTheme(p.theme||'default');goScreen('screen-app');}
+  else showToast('Nenhum perfil encontrado. Crie um!');
+}
+
+// ================================================================
+// APP RENDER
+// ================================================================
+function renderApp(){
+  if(!P)return;
+  updateXPDisplay();
+  document.getElementById('topbar-avatar').textContent=P.avatar;
+  // Adaptive greeting
+  const lp=getLp();
+  const heroName=document.getElementById('hero-name');
+  if(heroName){
+    if(P.age==='8-11') heroName.innerHTML=`${P.name}, bora <em>explorar</em> hoje? 🦊`;
+    else if(P.age==='18-21') heroName.innerHTML=`${P.name}, pronto para <em>aprofundar</em>?`;
+    else heroName.innerHTML=`${P.name}, pronto pra <em>aprender</em>?`;
+  }
+  document.getElementById('mission-tag').textContent=lp.missionTag;
+  // Style badge
+  const style=inferStyle();
+  const sb=document.getElementById('style-badge');
+  if(sb){const ls=LEARNING_STYLES[style];sb.textContent=`${ls.icon} ${ls.name}`;}
+  // Trail
+  const trail=detectTrail();
+  document.getElementById('trail-icon').textContent=trail.icon;
+  document.getElementById('trail-name').textContent=trail.name;
+  document.getElementById('trail-sub').textContent=trail.sub;
+  // Tips title
+  const tipsTitle=document.getElementById('tips-title');
+  if(tipsTitle)tipsTitle.textContent=lp.tipsSectionTitle;
+  // Event (Mon–Wed each week)
+  const today=new Date().getDay();
+  const eventEl=document.getElementById('event-banner');
+  if(today>=1&&today<=3&&eventEl){
+    const ev=EVENTS[Math.floor(Date.now()/604800000)%EVENTS.length];
+    eventEl.style.display='block';
+    eventEl.style.background=ev.bg;
+    document.getElementById('event-title').textContent=ev.title;
+    document.getElementById('event-sub').textContent=ev.sub;
+  }
+  // Mission
+  const missions=[
+    {title:{simple:'Missão: Cuidado com Links!',normal:'Golpes no WhatsApp',deep:'Análise de Phishing Vetorial'},mod:'security',lesson:'s3'},
+    {title:{simple:'Desafio: Verdade ou Mentira?',normal:'Verificando Fontes',deep:'Verificação de Provenance'},mod:'fakenews',lesson:'f2'},
+    {title:{simple:'Missão: Dois Cadeados!',normal:'Ative o 2FA Agora',deep:'Análise de Autenticação MFA'},mod:'security',lesson:'s2'},
+    {title:{simple:'Missão: Pegadas Digitais!',normal:'Pegadas Digitais',deep:'Rastro Digital e OPSEC'},mod:'social',lesson:'r1'},
+  ];
+  const lk=getLangKey();
+  const m=missions[new Date().getDate()%missions.length];
+  document.getElementById('mission-title').textContent=m.title[lk]||m.title.normal;
+  document.getElementById('mission-desc').textContent=lp.missionTag;
+  renderModules();
+  renderFeed();
+  // AI hint on first visit
+  if((P.lessonsCompleted||0)===0&&P.hintsEnabled!==false){
+    setTimeout(()=>showHint('first_lesson'),3000);
+  }
+}
+
+function renderModules(){
+  const grid=document.getElementById('modules-grid');
+  if(!grid||!P)return;
+  const descs={
+    security:{simple:'Proteja suas contas!',normal:'Senhas, 2FA, phishing e dados',deep:'Credenciais, autenticação e engenharia social'},
+    fakenews:{simple:'Descubra as mentiras!',normal:'Identificar desinformação e verificar fontes',deep:'Taxonomia da desinformação e fact-checking'},
+    social:{simple:'Fique seguro nas redes!',normal:'Exposição, perfis falsos e privacidade',deep:'Identidade digital, OSINT e LGPD'},
+    ai:{simple:'Descubra como a IA funciona!',normal:'IA, deepfakes e como detectar',deep:'ML, deepfakes, alinhamento e implicações'},
+  };
+  const lk=getLangKey();
+  grid.innerHTML=MODULES.map(m=>{
+    const done=P.completedModules[m.id];
+    const pct=Math.round(m.lessons.filter(l=>P.completedLessons[l.id]).length/m.lessons.length*100);
+    return`<div class="mod-card ${m.color}" onclick="openModule('${m.id}')">
+      ${done?'<div class="mod-done-badge">✓</div>':''}
+      <div><span class="mod-icon">${m.icon}</span>
+        <div class="mod-title">${m.title}</div>
+        <div class="mod-sub">${(descs[m.id]||{})[lk]||m.lessons.length+' lições'}</div>
+      </div>
+      <div><div class="mod-progress"><div class="mod-bar" style="width:${pct}%"></div></div>
+      <div class="mod-xp-tag">+${m.xp} XP</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderFeed(){
+  const feed=document.getElementById('feed-container');
+  if(!feed)return;
+  const tips=FEED_TIPS[P?.age||'12-14']||FEED_TIPS['12-14'];
+  feed.innerHTML=tips.map(t=>`<div class="feed-item">
+    <span class="feed-icon">${t.icon}</span>
+    <span class="feed-text">${t.text}</span>
+    <span class="feed-tag">${t.tag}</span>
+  </div>`).join('');
+}
+
+function startMissionDay(){
+  const missions=[{mod:'security',lesson:'s3'},{mod:'fakenews',lesson:'f2'},{mod:'security',lesson:'s2'},{mod:'social',lesson:'r1'}];
+  const m=missions[new Date().getDate()%missions.length];
+  currentModule=MODULES.find(x=>x.id===m.mod);
+  startLesson(m.mod,m.lesson);
+}
+function startTrail(){
+  const ep=P?.errorPatterns||{};
+  if(ep.security>1)openModule('security');
+  else if(ep.fakenews>1)openModule('fakenews');
+  else openModule('security');
+}
+function startEvent(){showToast('⚡ Evento ativo! XP em dobro nas simulações!');setTimeout(()=>openModule('fakenews'),600);}
+
+// ================================================================
+// MODULE
+// ================================================================
+function openModule(moduleId){
+  currentModule=MODULES.find(m=>m.id===moduleId);
+  if(!currentModule)return;
+  goScreen('screen-module');
+  const lk=getLangKey();
+  const descs={
+    security:{simple:'Proteja suas senhas e contas! 🔐',normal:'Senhas, 2FA, phishing e proteção de dados',deep:'Segurança de credenciais, autenticação multifator e engenharia social'},
+    fakenews:{simple:'Aprenda a descobrir mentiras na internet!',normal:'Identificar desinformação e verificar fontes',deep:'Taxonomia da desinformação, metodologia de fact-checking e propaganda computacional'},
+    social:{simple:'Use as redes sociais com segurança!',normal:'Exposição, perfis falsos e privacidade',deep:'Gestão de identidade digital, OSINT e privacidade sob a LGPD'},
+    ai:{simple:'Descubra como a IA pode te enganar!',normal:'Como a IA funciona e como detectar manipulação',deep:'Fundamentos de ML, deepfakes e implicações sociopolíticas'},
+  };
+  document.getElementById('mod-big-icon').textContent=currentModule.icon;
+  document.getElementById('mod-detail-title').textContent=currentModule.title;
+  document.getElementById('mod-detail-desc').textContent=(descs[currentModule.id]||{})[lk]||'';
+  document.getElementById('mod-lessons-count').textContent=currentModule.lessons.length+' lições';
+  document.getElementById('mod-xp-total').textContent='+'+currentModule.xp+' XP';
+  document.getElementById('mod-diff-tag').textContent='Nível: '+{simple:'Iniciante',normal:'Intermediário',deep:'Avançado'}[lk];
+  // Set explain toggle from saved
+  explainMode=P?.explainMode||'normal';
+  document.querySelectorAll('.explain-btn').forEach(b=>b.classList.remove('active'));
+  const modeMap={normal:0,deep:1,quick:2};
+  document.querySelectorAll('.explain-btn')[modeMap[explainMode]]?.classList.add('active');
+  renderLessons();
+  if(P?.hintsEnabled!==false) setTimeout(()=>showHint('before_quiz'),2500);
+}
+
+function setExplainMode(mode,btn){
+  explainMode=mode;
+  if(P){P.explainMode=mode;if(mode==='deep'){P.behaviorScore=P.behaviorScore||{};P.behaviorScore.deepModeUses=(P.behaviorScore.deepModeUses||0)+1;}saveState();}
+  document.querySelectorAll('.explain-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const msgs={normal:'📖 Modo Normal',deep:'🔬 Modo Aprofundado ativado!',quick:'⚡ Resumo Rápido'};
+  showToast(msgs[mode]);
+  if(mode==='deep'&&P?.hintsEnabled!==false)showHint('deep_mode');
+  checkAchievements();
+}
+
+function renderLessons(){
+  const list=document.getElementById('lessons-list');
+  if(!list||!currentModule||!P)return;
+  list.innerHTML=currentModule.lessons.map((l,i)=>{
+    const done=P.completedLessons[l.id];
+    return`<div class="lesson-item ${done?'done':''}" onclick="startLesson('${currentModule.id}','${l.id}')">
+      <div class="lesson-num">${done?'✓':(i+1)}</div>
+      <div class="lesson-body">
+        <div class="lesson-title">${l.icon} ${l.title}</div>
+        <div class="lesson-sub">${l.sub}</div>
+      </div>
+      <div class="lesson-badge">${done?'✓ Feito':'+'+l.xp+' XP'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ================================================================
+// LESSON ENGINE
+// ================================================================
+function startLesson(moduleId,lessonId){
+  currentModule=MODULES.find(m=>m.id===moduleId);
+  currentLesson=currentModule?.lessons.find(l=>l.id===lessonId);
+  if(!currentLesson)return;
+  quizState={answered:false,correct:0,total:0,questionIdx:0,wrongTopics:[],startTime:Date.now()};
+  goScreen('screen-lesson');
+  renderLessonStep();
+  if(P){P.behaviorScore=P.behaviorScore||{};}
+}
+
+function getQuizPool(){
+  const ageKey=P?.age||'12-14';
+  const pool=QUIZZES[currentLesson?.id];
+  if(!pool)return[];
+  // Variant selection
+  if(ageKey==='8-11'&&pool.simple?.length)return pool.simple;
+  if(ageKey==='18-21'&&pool.deep?.length)return[...(pool.normal||[]),...pool.deep];
+  return pool.normal||pool.simple||[];
+}
+
+function renderLessonStep(){
+  if(!currentLesson)return;
+  const content=document.getElementById('lesson-content');
+  const actions=document.getElementById('lesson-actions');
+  const qPool=getQuizPool();
+  const total=currentLesson.type==='quiz'?(qPool.length||1):1;
+  const stepLabel=document.getElementById('step-label');
+  const lpFill=document.getElementById('lp-fill');
+  const stepXP=document.getElementById('step-xp');
+  if(stepXP)stepXP.textContent='+'+currentLesson.xp+' XP';
+  if(stepLabel)stepLabel.textContent=currentLesson.type==='quiz'?`Questão ${quizState.questionIdx+1} de ${total}`:currentLesson.type==='sim'?'Simulação':'Conteúdo';
+  if(lpFill)lpFill.style.width=currentLesson.type==='quiz'?((quizState.questionIdx/total)*100)+'%':'50%';
+  if(currentLesson.type==='content')renderContent(content,actions);
+  else if(currentLesson.type==='quiz')renderQuiz(content,actions);
+  else if(currentLesson.type==='sim')renderSim(content,actions);
+}
+
+function renderContent(content,actions){
+  const data=CONTENT[currentLesson.id];
+  if(!data){content.innerHTML='<div class="content-card"><p>Conteúdo em breve!</p></div>';
+    actions.innerHTML=`<button class="btn-primary btn-full" onclick="completeLesson()">Continuar →</button>`;return;}
+  const k=getExplainKey();
+  content.innerHTML=`<div class="content-card">
+    <span class="content-icon">${data.icon}</span>
+    <div class="content-title">${data.title[k]||data.title.normal}</div>
+    <div class="content-body">${data.body[k]||data.body.normal}</div>
+    ${(data.tip[k]||data.tip.normal)?`<div class="content-tip">${data.tip[k]||data.tip.normal}</div>`:''}
+    ${(data.warning[k]||data.warning.normal)?`<div class="content-warning">${data.warning[k]||data.warning.normal}</div>`:''}
+  </div>`;
+  if(P){P.behaviorScore.reads=(P.behaviorScore.reads||0)+1;saveState();}
+  actions.innerHTML=`<button class="btn-primary btn-full" onclick="completeLesson()">Entendi! Continuar →</button>`;
+}
+
+function renderQuiz(content,actions){
+  const questions=getQuizPool();
+  if(!questions.length){
+    content.innerHTML='<div class="content-card"><p>Quiz em breve!</p></div>';
+    actions.innerHTML=`<button class="btn-primary btn-full" onclick="completeLesson()">Continuar →</button>`;return;
+  }
+  const q=questions[quizState.questionIdx%questions.length];
+  quizState.answered=false;
+  if(P){P.behaviorScore.challenges=(P.behaviorScore.challenges||0)+1;saveState();}
+  content.innerHTML=`<div class="content-card">
+    <span class="content-icon">🎯</span>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">
+      ${q.opts.map((opt,i)=>`<button class="quiz-opt" onclick="answerQuiz(${i},${q.c},this)">${opt}</button>`).join('')}
+    </div>
+    <div id="quiz-fb"></div>
+    <div id="pattern-area"></div>
+  </div>`;
+  actions.innerHTML=`<div id="quiz-next"></div>`;
+}
+
+function answerQuiz(chosen,correct,btn){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  const isOk=chosen===correct;
+  const questions=getQuizPool();
+  const q=questions[quizState.questionIdx%questions.length];
+  const ek=getExplainKey();
+  const exp=(q.exp&&(q.exp[ek]||q.exp.normal||q.exp.simple))||'';
+  document.querySelectorAll('.quiz-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    if(i===chosen&&!isOk)o.classList.add('wrong');
+  });
+  if(isOk){quizState.correct++;}
+  else{
+    const topic=currentModule?.id==='fakenews'?'fakenews':'security';
+    if(P){P.errorPatterns=P.errorPatterns||{};P.errorPatterns[topic]=(P.errorPatterns[topic]||0)+1;saveState();}
+    if(P?.hintsEnabled!==false)setTimeout(()=>showHint('quiz_wrong'),1200);
+  }
+  const lp=getLp();
+  const msgs=isOk?lp.correct:lp.wrong;
+  const msg=msgs[Math.floor(Math.random()*msgs.length)];
+  const fb=document.getElementById('quiz-fb');
+  if(fb){
+    fb.className='quiz-feedback '+(isOk?'correct':'wrong');
+    fb.innerHTML=`<strong>${msg}</strong><br>${exp}`;
+  }
+  // Error pattern card — after 2+ errors on same topic
+  if(!isOk){
+    const ep=P?.errorPatterns||{};
+    const topic=currentModule?.id==='fakenews'?'fakenews':'security';
+    if((ep[topic]||0)>=2){
+      const pa=document.getElementById('pattern-area');
+      if(pa){
+        const hintKey=topic==='fakenews'?'pattern_fakenews':'pattern_security';
+        const hints=HINTS[hintKey];
+        const hint=hints&&hints[P.age]?hints[P.age][0]:'Revise o conteúdo deste tópico!';
+        pa.innerHTML=`<div class="error-pattern-card"><div class="epc-label">🔍 Padrão detectado pelo sistema</div><div class="epc-text">${hint}</div></div>`;
+      }
+    }
+  }
+  playSound(isOk?'correct':'wrong');
+  const nextBtn=document.getElementById('quiz-next');
+  if(nextBtn){
+    if(quizState.questionIdx<questions.length-1){
+      nextBtn.innerHTML=`<button class="btn-primary btn-full mt12" onclick="nextQuestion()">Próxima questão →</button>`;
+    } else {
+      nextBtn.innerHTML=`<button class="btn-primary btn-full mt12" onclick="completeLesson()">Ver resultado 🏆</button>`;
+    }
+  }
+}
+
+function nextQuestion(){
+  quizState.questionIdx++;
+  renderQuiz(document.getElementById('lesson-content'),document.getElementById('lesson-actions'));
+  const lpFill=document.getElementById('lp-fill');
+  const total=getQuizPool().length||1;
+  if(lpFill)lpFill.style.width=((quizState.questionIdx/total)*100)+'%';
+}
+
+function renderSim(content,actions){
+  const pool=SIMS[currentLesson?.id];
+  if(!pool?.length){
+    content.innerHTML='<div class="content-card"><p>Simulação em breve!</p></div>';
+    actions.innerHTML=`<button class="btn-primary btn-full" onclick="completeLesson()">Continuar →</button>`;return;
+  }
+  // Variation: pick randomly from pool, exclude last used
+  const simIdx=Math.floor(Math.random()*pool.length);
+  const sim=pool[simIdx];
+  const lp=getLp();
+  const ek=getExplainKey();
+  const expText=(sim.exp&&(sim.exp[ek]||sim.exp.normal||sim.exp.simple))||'';
+  const expEncoded=encodeURIComponent(expText);
+  content.innerHTML=`<div class="content-card" style="padding:0;overflow:hidden">
+    <div style="padding:16px;border-bottom:1px solid var(--border)">
+      <div class="content-title" style="font-size:1rem">${sim.title}</div>
+      <div style="font-size:.8rem;color:var(--subtext)">${lp.simPrompt}</div>
+    </div>
+    <div class="sim-phone">
+      <div class="sim-phone-bar"><div class="sim-av">📱</div>
+        <div><div style="font-weight:600;font-size:.82rem">${sim.from}</div><div style="font-size:.68rem;opacity:.7">online</div></div>
+      </div>
+      <div class="sim-msgs">${sim.msgs.map(m=>`<div class="sim-msg ${m.t}">${m.m}</div>`).join('')}</div>
+      <div class="sim-verdict" id="sim-verdict">
+        <button class="sim-btn safe" onclick="answerSim(false,${sim.isScam},'${expEncoded}')">✅ É seguro</button>
+        <button class="sim-btn danger" onclick="answerSim(true,${sim.isScam},'${expEncoded}')">🚨 É suspeito</button>
+      </div>
+    </div>
+  </div><div id="sim-fb"></div>`;
+  actions.innerHTML=`<div id="sim-next"></div>`;
+}
+
+function answerSim(flagged,isScam,expEncoded){
+  const correct=flagged===isScam;
+  const exp=decodeURIComponent(expEncoded);
+  const lp=getLp();
+  const msg=correct?lp.correct[0]:lp.wrong[0];
+  const fb=document.getElementById('sim-fb');
+  if(fb){fb.className='quiz-feedback '+(correct?'correct':'wrong');fb.innerHTML=`<strong>${msg}</strong><br>${exp}`;}
+  const verdict=document.getElementById('sim-verdict');
+  if(verdict)verdict.style.pointerEvents='none';
+  playSound(correct?'correct':'wrong');
+  if(!correct&&P){
+    P.errorPatterns=P.errorPatterns||{};P.errorPatterns.security=(P.errorPatterns.security||0)+1;saveState();
+    if(P.hintsEnabled!==false)setTimeout(()=>showHint('quiz_wrong'),1000);
+  }
+  const next=document.getElementById('sim-next');
+  if(next)next.innerHTML=`<button class="btn-primary btn-full mt12" onclick="completeLesson()">Continuar →</button>`;
+}
+
+function completeLesson(){
+  if(!P||!currentLesson)return;
+  if(P.completedLessons[currentLesson.id]){
+    showToast('✓ Já concluída! Sem XP extra.');
+    leaveLesson();return;
+  }
+  P.completedLessons[currentLesson.id]=true;
+  P.lessonsCompleted=(P.lessonsCompleted||0)+1;
+  P.xp=(P.xp||0)+currentLesson.xp;
+  P.totalXp=(P.totalXp||0)+currentLesson.xp;
+  // Perfect quiz
+  if(currentLesson.type==='quiz'){
+    const pool=getQuizPool();
+    if(pool.length&&quizState.correct===pool.length&&!P.achievements.includes('perfect'))P.achievements.push('perfect');
+  }
+  // Module completion
+  if(currentModule){
+    const allDone=currentModule.lessons.every(l=>P.completedLessons[l.id]);
+    if(allDone&&!P.completedModules[currentModule.id]){
+      P.completedModules[currentModule.id]=true;
+      showToast(`🎉 Módulo "${currentModule.title}" concluído!`);
+    }
+  }
+  saveState();checkAchievements();updateXPDisplay();
+  const icons={content:'📖',sim:'🎭',quiz:'⭐'};
+  const lp=getLp();
+  showXPPopup(currentLesson.xp,currentLesson.title,icons[currentLesson.type]||'⭐',lp.correct[0]);
+  playSound('success');
+  // AI hint for first lesson
+  if((P.lessonsCompleted||0)===1&&P.hintsEnabled!==false)setTimeout(()=>showHint('first_lesson'),500);
+}
+
+// ================================================================
+// PROFILE
+// ================================================================
+function renderProfile(){
+  if(!P)return;
+  const lvlIdx=getLevel(P.xp);
+  const lvl=LEVELS[lvlIdx];
+  document.getElementById('profile-av').textContent=P.avatar;
+  document.getElementById('profile-name').textContent=P.name;
+  document.getElementById('profile-level').textContent=`${lvl.icon} Nível ${lvlIdx+1} — ${lvl.name} · ${P.age} anos`;
+  document.getElementById('stat-xp').textContent=P.totalXp||0;
+  document.getElementById('stat-done').textContent=P.lessonsCompleted||0;
+  document.getElementById('stat-streak').textContent=P.daysStreak||1;
+  // Dropdowns
+  const ts=document.getElementById('theme-select');if(ts)ts.value=P.theme||'default';
+  const ls=document.getElementById('lang-select');if(ls)ls.value=P.langLevel||'auto';
+  // Learning style
+  const style=inferStyle();
+  const lsData=LEARNING_STYLES[style];
+  document.getElementById('ls-icon').textContent=lsData.icon;
+  document.getElementById('ls-name').textContent=lsData.name;
+  document.getElementById('ls-desc').textContent=lsData.desc;
+  // Error patterns
+  const ep=P.errorPatterns||{};
+  const epArr=Object.entries(ep).filter(([,v])=>v>0).map(([k,v])=>`${k==='security'?'Segurança/Phishing':k==='fakenews'?'Fake News':k}: ${v} erro(s)`);
+  document.getElementById('error-patterns').textContent=epArr.length?epArr.join(' · '):'Nenhum padrão registrado ainda.';
+  // Hints toggle
+  const togH=document.getElementById('tog-hints');
+  if(togH)P.hintsEnabled!==false?togH.classList.add('on'):togH.classList.remove('on');
+  // Achievements
+  const grid=document.getElementById('achievements-grid');
+  if(grid)grid.innerHTML=ACHIEVEMENTS.map(a=>{
+    const earned=P.achievements?.includes(a.id);
+    return`<div class="achv-item ${earned?'earned':''}"><span class="achv-icon">${a.icon}</span><div class="achv-name">${a.name}</div></div>`;
+  }).join('');
+}
+
+function setLangLevel(val){
+  langLevel=val;
+  if(P){P.langLevel=val;saveState();}
+  const labels={auto:'Auto',simple:'Simples',normal:'Normal',deep:'Aprofundado'};
+  showToast(`🗣️ Linguagem: ${labels[val]}`);
+}
+function toggleDeepDefault(){
+  const on=document.getElementById('tog-deep')?.classList.contains('on');
+  explainMode=on?'deep':'normal';
+  if(P){P.explainMode=explainMode;saveState();}
+}
+function switchProfile(){if(confirm('Trocar de perfil?'))goScreen('screen-welcome');}
+function resetProfile(){
+  if(!confirm('Resetar TODO o progresso?'))return;
+  if(P){
+    P.xp=0;P.totalXp=0;P.lessonsCompleted=0;
+    P.completedLessons={};P.completedModules={};
+    P.achievements=[];P.errorPatterns={};P.behaviorScore={};
+    saveState();showToast('Progresso resetado!');renderProfile();updateXPDisplay();
+  }
+}
+
+// ================================================================
+// RANKING
+// ================================================================
+function renderRanking(){
+  const list=document.getElementById('ranking-list');
+  if(!list)return;
+  const players=[
+    {name:'Sofia M.',avatar:'🦋',xp:840},
+    {name:'Lucas T.',avatar:'🐼',xp:720},
+    {name:'Ana K.',avatar:'🦄',xp:615},
+    {name:P?.name||'Você',avatar:P?.avatar||'🦊',xp:P?.totalXp||0,me:true},
+    {name:'Gabriel R.',avatar:'🦁',xp:380},
+    {name:'Mariana S.',avatar:'🐙',xp:290},
+    {name:'Pedro V.',avatar:'🐲',xp:150},
+  ].sort((a,b)=>b.xp-a.xp);
+  const medals=['gold','silver','bronze'];
+  list.innerHTML=players.map((p,i)=>`<div class="rank-item ${p.me?'me':''}">
+    <div class="rank-pos ${medals[i]||''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+    <div class="rank-av">${p.avatar}</div>
+    <div class="rank-name">${p.name}${p.me?' (você)':''}</div>
+    <div class="rank-xp">${p.xp} XP</div>
+  </div>`).join('');
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function getLevel(xp){for(let i=LEVELS.length-1;i>=0;i--)if(xp>=LEVELS[i].min)return i;return 0;}
+function updateXPDisplay(){
+  if(!P)return;
+  const xp=P.xp,li=getLevel(xp),lvl=LEVELS[li];
+  const next=LEVELS[Math.min(li+1,LEVELS.length-1)];
+  const pct=((xp-lvl.min)/(next.min-lvl.min))*100;
+  const d=document.getElementById('xp-display');
+  if(d)d.textContent=xp;
+  const bar=document.getElementById('xpbar-fill');
+  if(bar)bar.style.width=Math.min(100,pct)+'%';
+  const ll=document.getElementById('level-label');
+  if(ll)ll.textContent=`${lvl.icon} Nível ${li+1} — ${lvl.name}`;
+  const nl=document.getElementById('xp-next-label');
+  if(nl)nl.textContent=`${xp}/${next.min}`;
+}
+function checkAchievements(){
+  if(!P)return;
+  const toCheck=[
+    {id:'first',cond:P.lessonsCompleted>=1},
+    {id:'speed',cond:P.lessonsCompleted>=3},
+    {id:'security',cond:P.completedModules?.security},
+    {id:'fakenews',cond:P.completedModules?.fakenews},
+    {id:'social',cond:P.completedModules?.social},
+    {id:'ai',cond:P.completedModules?.ai},
+    {id:'all',cond:['security','fakenews','social','ai'].every(m=>P.completedModules?.[m])},
+    {id:'xp500',cond:(P.totalXp||0)>=500},
+    {id:'streak3',cond:(P.daysStreak||1)>=3},
+    {id:'analyst',cond:(P.behaviorScore?.deepModeUses||0)>=3},
+  ];
+  toCheck.forEach(a=>{
+    if(a.cond&&!P.achievements.includes(a.id)){
+      P.achievements.push(a.id);
+      const achv=ACHIEVEMENTS.find(x=>x.id===a.id);
+      if(achv)showToast(`🏅 Conquista: ${achv.name}!`);
+    }
+  });
+  saveState();
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+function showXPPopup(xp,title,icon='⭐',desc='',welcome=false){
+  if(xp===0&&!welcome)return;
+  document.getElementById('pop-icon').textContent=icon;
+  document.getElementById('pop-title').textContent=welcome?title:'Lição Concluída!';
+  document.getElementById('pop-xp').textContent=welcome?'🚀':'+'+xp+' XP';
+  document.getElementById('pop-desc').textContent=desc||title;
+  document.getElementById('xp-popup')?.classList.add('show');
+  document.getElementById('overlay')?.classList.add('show');
+}
+function closePopup(){
+  document.getElementById('xp-popup')?.classList.remove('show');
+  document.getElementById('overlay')?.classList.remove('show');
+  if(currentLesson){leaveLesson();}
+}
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme||'default');
+  if(P){P.theme=theme;saveState();}
+}
+function toggleFont(){
+  const on=document.getElementById('tog-font')?.classList.contains('on');
+  document.documentElement.style.fontSize=on?'18px':'16px';
+}
+
+// ================================================================
+// AI HINT ENGINE
+// ================================================================
+function getHintText(type){
+  const ageKey=P?.age||'12-14';
+  const pool=HINTS[type];
+  if(!pool)return'';
+  const msgs=pool[ageKey]||pool['12-14'];
+  if(!msgs?.length)return'';
+  return msgs[Math.floor(Math.random()*msgs.length)];
+}
+function showHint(type){
+  if(!P||P.hintsEnabled===false)return;
+  const text=getHintText(type);
+  if(!text)return;
+  lastHintType=type;
+  const hint=document.getElementById('ai-hint');
+  if(!hint)return;
+  hint.style.display='flex';
+  document.getElementById('ai-hint-text').textContent=text;
+  clearTimeout(hintTimer);
+  hintTimer=setTimeout(dismissHint,9000);
+}
+function expandHint(){
+  const lp=getLp();
+  document.getElementById('ai-hint-text').textContent=lp.explainExtra;
+  clearTimeout(hintTimer);
+  hintTimer=setTimeout(dismissHint,6000);
+}
+function dismissHint(){
+  clearTimeout(hintTimer);
+  const hint=document.getElementById('ai-hint');
+  if(hint)hint.style.display='none';
+}
+
+// ================================================================
+// AUDIO
+// ================================================================
+const audioCtx=typeof AudioContext!=='undefined'?new AudioContext():null;
+function playSound(type){
+  if(!audioCtx)return;
+  if(P&&!document.getElementById('tog-sfx')?.classList.contains('on'))return;
+  try{
+    const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    const freqs={correct:[523,659,784],wrong:[300,250],success:[523,659,784,1047]};
+    const notes=freqs[type]||[440];
+    gain.gain.setValueAtTime(0.1,audioCtx.currentTime);
+    notes.forEach((f,i)=>{osc.frequency.setValueAtTime(f,audioCtx.currentTime+i*.12);});
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+notes.length*.12+.1);
+    osc.start(audioCtx.currentTime);osc.stop(audioCtx.currentTime+notes.length*.12+.15);
+  }catch(e){}
+}
+
+// ================================================================
+// INIT
+// ================================================================
+window.addEventListener('load',()=>{
+  const p=loadState();
+  if(p){P=p;langLevel=p.langLevel||'auto';explainMode=p.explainMode||'normal';applyTheme(p.theme||'default');}
+});
+</script>
+</body>
+</html>
