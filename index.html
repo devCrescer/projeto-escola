@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -37,6 +37,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* WELCOME */
 #screen-welcome{background:var(--cream);align-items:center;justify-content:center;position:relative;overflow:hidden;padding:2rem;}
+.welcome-actions{display:flex;flex-direction:column;gap:12px;}
+#screen-entry{align-items:center;justify-content:center;}
+#screen-entry .welcome-content{margin:0 auto;}
 .blob1,.blob2,.blob3{position:absolute;border-radius:60% 40% 30% 70%/60% 30% 70% 40%;animation:blob 8s ease-in-out infinite;z-index:0;}
 .blob1{width:320px;height:320px;background:linear-gradient(135deg,var(--terra),var(--gold));top:-80px;right:-60px;opacity:.7;}
 .blob2{width:240px;height:240px;background:linear-gradient(135deg,var(--teal),#A8D8D2);bottom:-60px;left:-40px;opacity:.6;animation-delay:-3s;}
@@ -335,7 +338,26 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 
 <!-- ===== WELCOME ===== -->
-<div id="screen-welcome" class="screen active">
+<div id="screen-entry" class="screen active">
+  <div class="blob1"></div><div class="blob2"></div><div class="blob3"></div>
+  <span class="sparkle s1">✦</span><span class="sparkle s2">★</span>
+  <span class="sparkle s3">✦</span><span class="sparkle s4">★</span>
+  <div class="welcome-content">
+    <div class="logo-badge"><span class="logo-dot"></span>Plataforma Educativa</div>
+    <div class="welcome-title">
+      <span class="outline">NET</span>
+      <span class="fill">SAFE</span>
+      <span class="script">na internet</span>
+    </div>
+    <p class="welcome-sub">Escolha uma opcao para continuar.</p>
+    <div class="welcome-actions">
+      <button class="btn-primary btn-full" onclick="openProject()">Projeto</button>
+      <button class="btn-secondary btn-full" onclick="openFacebook()">Acessar Facebook</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-welcome" class="screen">
   <div class="blob1"></div><div class="blob2"></div><div class="blob3"></div>
   <span class="sparkle s1">✦</span><span class="sparkle s2">★</span>
   <span class="sparkle s3">✦</span><span class="sparkle s4">★</span>
@@ -1280,6 +1302,13 @@ function finishOnboard(){
     showXPPopup(0,lp.greeting(P.name),'🎉','Bem-vindo ao NetSafe!\nSua jornada digital começa agora.',true);
   },500);
 }
+function openProject(){
+  goScreen('screen-welcome');
+}
+function openFacebook(){
+  window.open('https://www.facebook.com/share/18qd6g4REL/?mibextid=wwXIfr','_blank','noopener,noreferrer');
+}
+
 function loadExistingProfile(){
   const p=loadState();
   if(p){P=p;langLevel=p.langLevel||'auto';explainMode=p.explainMode||'normal';applyTheme(p.theme||'default');goScreen('screen-app');}
@@ -1885,3 +1914,5 @@ window.addEventListener('load',()=>{
 </script>
 </body>
 </html>
+
+
